@@ -6,7 +6,7 @@ app = Flask(__name__)
 def home():
     return {"home":"home"}
 
-@app.route('/webhook/', methods=['POST'])
+@app.route('/webhook/v0.5/consent-requests/on-init', methods=['POST'])
 def respond():
     print(request.json);
     return Response(status=200)
