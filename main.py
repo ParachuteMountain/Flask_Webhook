@@ -4,9 +4,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return {"home":"home"}
+    print("Home v1")
+    return {"home":"home v1"}
 
-@app.route('/v0.5/consent-requests/on-init/', methods=['POST'])
+@app.route('/v0.5/consent-requests/on-init', methods=['POST'])
 def respond():
     print("On_Init Recived!")
     print(request.json)
