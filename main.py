@@ -11,7 +11,7 @@ def pat_on_find():
     print("Patient find received!")
     # print(request.json)
     return render_template("index.html")
-    return jsonify(summary = {"Patient Find Response": request.json})
+    # return jsonify(summary = {"Patient Find Response": request.json})
 
 @app.route('/v0.5/consent-requests/on-init', methods=['POST'])
 def con_req_on_init():
