@@ -18,5 +18,11 @@ def con_req_on_init():
     print(request.json)
     return jsonify(summary = {"Con_Req": "On Init"})
 
+@app.route('/v0.5/consent-requests/on-status', methods=['POST'])
+def con_req_on_status():
+    print("Con Req on status received!")
+    print(request.json)
+    return jsonify(summary = {"Con_Req": "On Status"})
+
 if __name__ == '__main__':
     app.run(debug=False)
