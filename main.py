@@ -18,7 +18,7 @@ def getEncryptedText(rsaKey, secret):
 
 @app.route('/')
 def home():
-    return jsonify(summary = {"Home": "Home v2"})
+    return jsonify(summary = {"Home": "Home v3"})
 
 @app.route('/v0.5/patients/on-find', methods=['POST'])
 def pat_on_find():
