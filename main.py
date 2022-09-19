@@ -39,6 +39,12 @@ def users_auth_on_init():
     print(request.json)
     return jsonify(summary = {"Users auth": "On Init"})
 
+@app.route('/v0.5/users/auth/on-confirm', methods=['POST'])
+def users_auth_on_confirm():
+    print("Users auth on confirm received!")
+    print(request.json)
+    return jsonify(summary = {"Users auth": "On Confirm"})
+
 # HIP - SUBSCRIPTION REQUETS URLS
 @app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
 def sub_req_on_init():
