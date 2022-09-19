@@ -26,7 +26,14 @@ def pat_on_find():
     print(request.json)
     return jsonify(summary = {"Patient": "On Find"})
 
-# SUBSCRIPTION REQUETS URLS
+# HIP - LINKING URLs
+@app.route('/v0.5/users/auth/on-fetch-modes', methods=['POST'])
+def auth_on_fetch_modes():
+    print("Auth on fetch modes received!")
+    print(request.json)
+    return jsonify(summary = {"Auth": "On Fetch Modes"})
+
+# HIP - SUBSCRIPTION REQUETS URLS
 @app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
 def sub_req_on_init():
     print("Sub Req on init received!")
@@ -39,7 +46,7 @@ def sub_req_on_notify():
     print(request.json)
     return jsonify(summary = {"Sub_Req": "On Notify"})
 
-# CONSENT RREQUEST URLs
+# HIP/HIU - CONSENT REQUEST URLs
 @app.route('/v0.5/consent-requests/on-init', methods=['POST'])
 def con_req_on_init():
     print("Con Req on init received!")
