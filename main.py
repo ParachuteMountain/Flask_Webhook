@@ -27,7 +27,7 @@ def pat_on_find():
     return jsonify(summary = {"Patient": "On Find"})
 
 # SUBSCRIPTION REQUETS URLS
-@app.route('/v0.5/subscription-requests/cm/on-init', methods=['POST'])
+@app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
 def sub_req_on_init():
     print("Sub Req on init received!")
     print(request.json)
