@@ -18,7 +18,7 @@ def getEncryptedText(rsaKey, secret):
 
 @app.route('/')
 def home():
-    return jsonify(summary = {"Home": "Home v3"})
+    return jsonify(summary = {"Home": "Home v4"})
 
 @app.route('/v0.5/patients/on-find', methods=['POST'])
 def pat_on_find():
@@ -26,6 +26,14 @@ def pat_on_find():
     print(request.json)
     return jsonify(summary = {"Patient": "On Find"})
 
+# SUBSCRIPTION REQUETS URLS
+@app.route('/v0.5/subscription-requests/cm/on-init', methods=['POST'])
+def sub_req_on_init():
+    print("Sub Req on init received!")
+    print(request.json)
+    return jsonify(summary = {"Sub_Req": "On Init"})
+
+# CONSENT RREQUEST URLs
 @app.route('/v0.5/consent-requests/on-init', methods=['POST'])
 def con_req_on_init():
     print("Con Req on init received!")
