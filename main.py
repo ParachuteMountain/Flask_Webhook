@@ -32,6 +32,12 @@ def auth_on_fetch_modes():
     print("Auth on fetch modes received!")
     print(request.json)
     return jsonify(summary = {"Auth": "On Fetch Modes"})
+    
+@app.route('/v0.5/users/auth/on-init', methods=['POST'])
+def users_auth_on_init():
+    print("Users auth on init received!")
+    print(request.json)
+    return jsonify(summary = {"Users auth": "On Init"})
 
 # HIP - SUBSCRIPTION REQUETS URLS
 @app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
