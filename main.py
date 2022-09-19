@@ -33,6 +33,12 @@ def sub_req_on_init():
     print(request.json)
     return jsonify(summary = {"Sub_Req": "On Init"})
 
+@app.route('/v0.5/subscription-requests/hiu/on-notify', methods=['POST'])
+def sub_req_on_notify():
+    print("Sub Req on notify received!")
+    print(request.json)
+    return jsonify(summary = {"Sub_Req": "On Notify"})
+
 # CONSENT RREQUEST URLs
 @app.route('/v0.5/consent-requests/on-init', methods=['POST'])
 def con_req_on_init():
