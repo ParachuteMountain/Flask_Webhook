@@ -45,6 +45,12 @@ def users_auth_on_confirm():
     print(request.json)
     return jsonify(summary = {"Users auth": "On Confirm"})
 
+@app.route('/v0.5/links/link/on-add-contexts', methods=['POST'])
+def link_on_add_contexts():
+    print("Link on add contexts received!")
+    print(request.json)
+    return jsonify(summary = {"Link": "On Add Contexts"})
+
 # HIP - SUBSCRIPTION REQUETS URLS
 @app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
 def sub_req_on_init():
