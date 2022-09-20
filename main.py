@@ -51,7 +51,7 @@ def link_on_add_contexts():
     print(request.json)
     return jsonify(summary = {"Link": "On Add Contexts"})
 
-# HIP - SUBSCRIPTION REQUETS URLS
+# HIP - SUBSCRIPTION REQUESTS URLS
 @app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
 def sub_req_on_init():
     print("Sub Req on init received!")
@@ -64,7 +64,7 @@ def sub_req_on_notify():
     print(request.json)
     return jsonify(summary = {"Sub_Req": "On Notify"})
 
-# HIP/HIU - CONSENT REQUEST URLs
+# HIP/HIU - CONSENT REQUESTS URLs
 @app.route('/v0.5/consent-requests/on-init', methods=['POST'])
 def con_req_on_init():
     print("Con Req on init received!")
@@ -77,6 +77,20 @@ def con_req_on_status():
     print(request.json)
     return jsonify(summary = {"Con_Req": "On Status"})
 
+# ANY NOTIFICATIONS URLs
+@app.route('/v0.5/consents/hiu/notify', methods=['POST'])
+def con_hiu_notify():
+    print("Con HIU notify received!")
+    print(request.json)
+    return jsonify(summary = {"Con": "HIU Notify"})
+
+@app.route('/v0.5/consents/hip/notify', methods=['POST'])
+def con_hip_notify():
+    print("Con HIP notify received!")
+    print(request.json)
+    return jsonify(summary = {"Con": "HIP Notify"})
+
+# ENCRYPTION OF DATA USING RSA ECB PCKS
 @app.route('/encrypt-secret/<keyType>/<secret>', methods=['POST'])
 def enc_secret(keyType, secret):
     print("Encrypting secret!")
@@ -101,6 +115,7 @@ def enc_secret(keyType, secret):
     print(encrypted_secret)
     # print(request.json)
     return jsonify({"encSecret": encrypted_secret})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
