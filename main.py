@@ -20,77 +20,87 @@ def getEncryptedText(rsaKey, secret):
 def home():
     return jsonify(summary = {"Home": "Home v4"})
 
-@app.route('/v0.5/patients/on-find', methods=['POST'])
-def pat_on_find():
-    print("Patient find received!")
-    print(request.json)
-    return jsonify(summary = {"Patient": "On Find"})
-
-# HIP - LINKING URLs
+# ---------------------------- HIP ---------------------------#
+#   LINKING CARE CONTEXTS URLs
 @app.route('/v0.5/users/auth/on-fetch-modes', methods=['POST'])
 def auth_on_fetch_modes():
-    print("Auth on fetch modes received!")
+    print("HIP LOG: Auth on fetch modes received!")
     print(request.json)
-    return jsonify(summary = {"Auth": "On Fetch Modes"})
+    return jsonify(summary = {"HIP Auth": "On Fetch Modes"})
     
 @app.route('/v0.5/users/auth/on-init', methods=['POST'])
 def users_auth_on_init():
-    print("Users auth on init received!")
+    print("HIP LOG: Users auth on init received!")
     print(request.json)
-    return jsonify(summary = {"Users auth": "On Init"})
+    return jsonify(summary = {"HIP Users auth": "On Init"})
 
 @app.route('/v0.5/users/auth/on-confirm', methods=['POST'])
 def users_auth_on_confirm():
-    print("Users auth on confirm received!")
+    print("HIP LOG: Users auth on confirm received!")
     print(request.json)
-    return jsonify(summary = {"Users auth": "On Confirm"})
+    return jsonify(summary = {"HIP Users auth": "On Confirm"})
 
 @app.route('/v0.5/links/link/on-add-contexts', methods=['POST'])
 def link_on_add_contexts():
-    print("Link on add contexts received!")
+    print("HIP LOG: Link on add contexts received!")
     print(request.json)
-    return jsonify(summary = {"Link": "On Add Contexts"})
+    return jsonify(summary = {"HIP Link": "On Add Contexts"})
 
-# HIP - SUBSCRIPTION REQUESTS URLS
+#   CONSENT REQUESTS URLs
+@app.route('/v0.5/consents/hip/notify', methods=['POST'])
+def con_hip_notify():
+    print("HIP LOG: Con HIP notify received!")
+    print(request.json)
+    return jsonify(summary = {"HIP Con": "HIP Notify"})
+
+#   SUBSCRIPTION REQUESTS URLs
 @app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
 def sub_req_on_init():
-    print("Sub Req on init received!")
+    print("HIP LOG: Sub Req on init received!")
     print(request.json)
-    return jsonify(summary = {"Sub_Req": "On Init"})
+    return jsonify(summary = {"HIP Sub_Req": "On Init"})
 
 @app.route('/v0.5/subscription-requests/hiu/on-notify', methods=['POST'])
 def sub_req_on_notify():
-    print("Sub Req on notify received!")
+    print("HIP LOG: Sub Req on notify received!")
     print(request.json)
-    return jsonify(summary = {"Sub_Req": "On Notify"})
+    return jsonify(summary = {"HIP Sub_Req": "On Notify"})
 
-# HIP/HIU - CONSENT REQUESTS URLs
+# ---------------------------- HIU ---------------------------#
+#   CONSENT REQUESTS URLs
+@app.route('/v0.5/patients/on-find', methods=['POST'])
+def pat_on_find():
+    print("HIU LOG: Patient find received!")
+    print(request.json)
+    return jsonify(summary = {"HIU Patient": "On Find"})
+
 @app.route('/v0.5/consent-requests/on-init', methods=['POST'])
 def con_req_on_init():
-    print("Con Req on init received!")
+    print("HIU LOG: Con Req on init received!")
     print(request.json)
-    return jsonify(summary = {"Con_Req": "On Init"})
+    return jsonify(summary = {"HIU Con_Req": "On Init"})
 
 @app.route('/v0.5/consent-requests/on-status', methods=['POST'])
 def con_req_on_status():
-    print("Con Req on status received!")
+    print("HIU LOG: Con Req on status received!")
     print(request.json)
-    return jsonify(summary = {"Con_Req": "On Status"})
+    return jsonify(summary = {"HIU Con_Req": "On Status"})
 
-# ANY NOTIFICATIONS URLs
 @app.route('/v0.5/consents/hiu/notify', methods=['POST'])
 def con_hiu_notify():
-    print("Con HIU notify received!")
+    print("HIU LOG: Con HIU notify received!")
     print(request.json)
-    return jsonify(summary = {"Con": "HIU Notify"})
+    return jsonify(summary = {"HIU Con": "HIU Notify"})
 
-@app.route('/v0.5/consents/hip/notify', methods=['POST'])
-def con_hip_notify():
-    print("Con HIP notify received!")
+@app.route('/v0.5/consents/on-fetch', methods=['POST'])
+def con_on_fetch():
+    print("HIU LOG: Con on fetch received!")
     print(request.json)
-    return jsonify(summary = {"Con": "HIP Notify"})
+    return jsonify(summary = {"HIU Con": "On Fetch"})
 
-# ENCRYPTION OF DATA USING RSA ECB PCKS
+
+
+# --------------- DATA ENCRYPTION USING RSA ECB PCKS -------------
 @app.route('/encrypt-secret/<keyType>/<secret>', methods=['POST'])
 def enc_secret(keyType, secret):
     print("Encrypting secret!")
