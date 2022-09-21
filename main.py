@@ -94,11 +94,15 @@ def con_hiu_notify():
 
 @app.route('/v0.5/consents/on-fetch', methods=['POST'])
 def con_on_fetch():
-    print("HIU LOG: Con on fetch received!")
+    print("HIU LOG: Con Art on fetch received!")
     print(request.json)
-    return jsonify(summary = {"HIU Con": "On Fetch"})
+    return jsonify(summary = {"HIU Con_Art": "On Fetch"})
 
-
+@app.route('/v0.5/health-information/hiu/on-request', methods=['POST'])
+def hi_on_request():
+    print("HIU LOG: HI on request received!")
+    print(request.json)
+    return jsonify(summary = {"HIU HI": "On Request"})
 
 # --------------- DATA ENCRYPTION USING RSA ECB PCKS -------------
 @app.route('/encrypt-secret/<keyType>/<secret>', methods=['POST'])
