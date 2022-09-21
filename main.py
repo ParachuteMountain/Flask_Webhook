@@ -53,6 +53,12 @@ def con_hip_notify():
     print(request.json)
     return jsonify(summary = {"HIP Con": "HIP Notify"})
 
+@app.route('/v0.5/health-information/hip/request', methods=['POST'])
+def hi_request():
+    print("HIP LOG: HI request received!")
+    print(request.json)
+    return jsonify(summary = {"HIP HI": "Request"})
+
 #   SUBSCRIPTION REQUESTS URLs
 @app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
 def sub_req_on_init():
