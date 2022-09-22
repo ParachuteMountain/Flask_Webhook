@@ -129,7 +129,6 @@ def enc_secret(keyType, secret):
     }
     response = requests.request("GET", url, headers=headers, data=payload)
     text = response.text
-    print(text)
     public_key = text.replace('\n','').split('-----')[2]
     encrypted_secret = getEncryptedText(public_key, secret)
 
