@@ -115,6 +115,7 @@ def hi_on_request():
 def enc_secret(keyType, secret):
     print("Encrypting secret!")
     print(keyType)
+    print(type(keyType))
     print(secret)
 
     url = None
@@ -125,10 +126,15 @@ def enc_secret(keyType, secret):
 
     payload={}
     headers = {
-    'Accept-Language': 'en-US'
+        'Accept-Language': 'en-US'
     }
+
+    print("URL START")
     response = requests.request("GET", url, headers=headers, data=payload)
+    print("URL END")
+
     text = response.text
+    print(text)
     public_key = text.replace('\n','').split('-----')[2]
     encrypted_secret = getEncryptedText(public_key, secret)
 
