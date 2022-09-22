@@ -121,7 +121,7 @@ def enc_secret(keyType, secret):
     if keyType == "0":
         url = "https://healthidsbx.abdm.gov.in/api/v1/auth/cert"
     if keyType == "1":
-        url = "https://phrbeta.abdm.gov.in:443/api/v1/phr/public/certificate"
+        url = "https://phr.abdm.gov.in:443/api/v1/phr/public/certificate"
 
     payload={}
     headers = {
@@ -129,6 +129,7 @@ def enc_secret(keyType, secret):
     }
     response = requests.request("GET", url, headers=headers, data=payload)
     text = response.text
+    print(text)
     public_key = text.replace('\n','').split('-----')[2]
     encrypted_secret = getEncryptedText(public_key, secret)
 
