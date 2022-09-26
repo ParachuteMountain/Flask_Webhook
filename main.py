@@ -46,6 +46,12 @@ def link_on_add_contexts():
     print(request.json)
     return jsonify(summary = {"HIP Link": "On Add Contexts"})
 
+@app.route('/v0.5/links/context/on-notify', methods=['POST'])
+def link_on_notify():
+    print("HIP LOG: Link on notify received!")
+    print(request.json)
+    return jsonify(summary = {"HIP Link": "On Notify"})
+
 #   CONSENT REQUESTS URLs
 @app.route('/v0.5/consents/hip/notify', methods=['POST'])
 def con_hip_notify():
