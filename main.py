@@ -3,9 +3,21 @@ from flask import Flask, request, Response, render_template, jsonify
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Cipher import PKCS1_v1_5
 import requests
+import uuid
+import datetime
+import json
 import base64
 
 app = Flask(__name__)
+
+# BASE URLs
+MAIN_URL = "https://dev.abdm.gov.in/gateway"
+GATEWAY_HOST = f"{MAIN_URL}/gateway"
+CM_URL = f"{MAIN_URL}/cm"
+
+# TOKENS
+ONLY_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE2NjQyODA5NjAsImlhdCI6MTY2NDI4MDM2MCwianRpIjoiYjE1YWM1MmUtZDczNy00ZTFmLWE1ZjQtNjAyZGY4M2Q1NGM1IiwiaXNzIjoiaHR0cHM6Ly9kZXYubmRobS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJiYTVkNzYzMC0xODU2LTRhZjUtYTRiZi01Mjg5ODZiMThkZjIiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJTQlhfMDAyMDA3Iiwic2Vzc2lvbl9zdGF0ZSI6ImNmZDMyMzRhLTIzMjMtNDJjMi04YTA5LWFjZDQ4OWIwZDg2YSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo5MDA3Il0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsImhlYWx0aElkIiwiT0lEQyIsImhpcCJdfSwicmVzb3VyY2VfYWNjZXNzIjp7IlNCWF8wMDIwMDciOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTAuMjMzLjY3LjYwIiwiY2xpZW50SWQiOiJTQlhfMDAyMDA3IiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtc2J4XzAwMjAwNyIsImNsaWVudEFkZHJlc3MiOiIxMC4yMzMuNjcuNjAifQ.A7lb3fushdeRSXFnYTSR1c3a54Nzw7aeXws4W9EajZu9Q3sg5WbkJBw94lesj76TMxfd0Rnkjv_sJakrAPIQsM84lwD58KulTZFLFMqodiV2l-FuaPh5mwlWZvVUZ2Ff395xmDna-YLYjcQwhpxHh-lQl91-n36x4EMQCF_5_rL4m2CqU7kFz1_B-KFvzt0c5hS1qubbkq4pS5fWqckmXMJvXHV7sAo9qacLwnS9H5GLNnQCttoMI_dg5FPqMaSthzuhp6_nKuXjXmSkAP0RrhgyLNkZA6uc0xTD04XWbJGPyBjWiLa1GqpG5za8npDYshT2rZLN35hby2kvbof4Ng"
+GATEWAY_AUTH_TOKEN = f"Bearer {ONLY_TOKEN}"
 
 # encrypting secret using RSA PCKS
 def getEncryptedText(rsaKey, secret):
@@ -57,6 +69,42 @@ def link_on_notify():
 def con_hip_notify():
     print("HIP LOG: Con HIP notify received!")
     print(request.json)
+
+    # HIP ON-NOTIFY: quickly send callback to CM about acknowledgement
+    req_data = request.json
+    con_art_id = req_data['notification']['consentDetail']['consentId']
+    con_art_resp_req_id = req_data['requestId']
+    cbl_url = f"{GATEWAY_HOST}/v0.5/consents/hip/on-notify"
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()
+    payload = json.dumps({
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "acknowledgement": [
+            {
+                "status": "OK",
+                "consentId": con_art_id
+            }
+        ],
+        "error": {
+            "code": 1000,
+            "message": "string"
+        },
+        "resp": {
+            "requestId": con_art_resp_req_id
+        }
+    })
+    headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx',
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("POST", cbl_url, headers=headers, data=payload)
+    print("--------- HIP LOG: HIP has sent on-notify to CM ----------")
+    print(f"HIP LOG: On-notify req ID {req_id}")
+    print(f"HIP LOG: On-notify timestamp {tstmp}")
+    print(f"-----------------------------------")
+
     return jsonify(summary = {"HIP Con": "HIP Notify"})
 
 @app.route('/v0.5/health-information/hip/request', methods=['POST'])
@@ -102,6 +150,42 @@ def con_req_on_status():
 def con_hiu_notify():
     print("HIU LOG: Con HIU notify received!")
     print(request.json)
+
+    # HIU ON-NOTIFY: quickly send callback to CM about acknowledgement
+    req_data = request.json
+    con_art_id = req_data['notification']['consentArtefacts'][0]['id']
+    con_art_resp_req_id = req_data['requestId']
+    cbl_url = f"{GATEWAY_HOST}/v0.5/consents/hiu/on-notify"
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()
+    payload = json.dumps({
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "acknowledgement": [
+            {
+                "status": "OK",
+                "consentId": con_art_id
+            }
+        ],
+        "error": {
+            "code": 1000,
+            "message": "string"
+        },
+        "resp": {
+            "requestId": con_art_resp_req_id
+        }
+    })
+    headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx',
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("POST", cbl_url, headers=headers, data=payload)
+    print("--------- HIU LOG: HIU has sent on-notify to CM ----------")
+    print(f"HIU LOG: On-notify req ID {req_id}")
+    print(f"HIU LOG: On-notify timestamp {tstmp}")
+    print(f"-----------------------------------")
+
     return jsonify(summary = {"HIU Con": "HIU Notify"})
 
 @app.route('/v0.5/consents/on-fetch', methods=['POST'])
