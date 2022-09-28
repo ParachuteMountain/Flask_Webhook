@@ -11,7 +11,7 @@ import base64
 app = Flask(__name__)
 
 # BASE URLs
-MAIN_URL = "https://dev.abdm.gov.in/gateway"
+MAIN_URL = "https://dev.abdm.gov.in"
 GATEWAY_HOST = f"{MAIN_URL}/gateway"
 CM_URL = f"{MAIN_URL}/cm"
 
@@ -29,7 +29,7 @@ def getEncryptedText(rsaKey, secret):
 
 @app.route('/')
 def home():
-    return jsonify(summary = {"Home": "Home v4"})
+    return jsonify(summary = {"Home": "Home v8"})
 
 # -------------------- RUN FOR AUTH TOKEN --------------------#
 @app.route('/get-token', methods=['GET'])
@@ -44,11 +44,11 @@ def get_gateway_token():
     headers = {
         'Content-Type': 'application/json'
     }
-    response = requests.request("GET", sessions_url, headers=headers, data=payload)
+    response = requests.request('POST', sessions_url, headers=headers, data=payload)
     global GATEWAY_AUTH_TOKEN
-    GATEWAY_AUTH_TOKEN = f"Bearer {response.json.accessToken}"
+    GATEWAY_AUTH_TOKEN = f"Bearer {response.json()['accessToken']}"
 
-    return response
+    return response.json()
 
 # ---------------------------- HIP ---------------------------#
 #   LINKING CARE CONTEXTS URLs
