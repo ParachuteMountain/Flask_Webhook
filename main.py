@@ -15,9 +15,8 @@ MAIN_URL = "https://dev.abdm.gov.in/gateway"
 GATEWAY_HOST = f"{MAIN_URL}/gateway"
 CM_URL = f"{MAIN_URL}/cm"
 
-# TOKENS
-ONLY_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE2NjQyODA5NjAsImlhdCI6MTY2NDI4MDM2MCwianRpIjoiYjE1YWM1MmUtZDczNy00ZTFmLWE1ZjQtNjAyZGY4M2Q1NGM1IiwiaXNzIjoiaHR0cHM6Ly9kZXYubmRobS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJiYTVkNzYzMC0xODU2LTRhZjUtYTRiZi01Mjg5ODZiMThkZjIiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJTQlhfMDAyMDA3Iiwic2Vzc2lvbl9zdGF0ZSI6ImNmZDMyMzRhLTIzMjMtNDJjMi04YTA5LWFjZDQ4OWIwZDg2YSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo5MDA3Il0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsImhlYWx0aElkIiwiT0lEQyIsImhpcCJdfSwicmVzb3VyY2VfYWNjZXNzIjp7IlNCWF8wMDIwMDciOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTAuMjMzLjY3LjYwIiwiY2xpZW50SWQiOiJTQlhfMDAyMDA3IiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtc2J4XzAwMjAwNyIsImNsaWVudEFkZHJlc3MiOiIxMC4yMzMuNjcuNjAifQ.A7lb3fushdeRSXFnYTSR1c3a54Nzw7aeXws4W9EajZu9Q3sg5WbkJBw94lesj76TMxfd0Rnkjv_sJakrAPIQsM84lwD58KulTZFLFMqodiV2l-FuaPh5mwlWZvVUZ2Ff395xmDna-YLYjcQwhpxHh-lQl91-n36x4EMQCF_5_rL4m2CqU7kFz1_B-KFvzt0c5hS1qubbkq4pS5fWqckmXMJvXHV7sAo9qacLwnS9H5GLNnQCttoMI_dg5FPqMaSthzuhp6_nKuXjXmSkAP0RrhgyLNkZA6uc0xTD04XWbJGPyBjWiLa1GqpG5za8npDYshT2rZLN35hby2kvbof4Ng"
-GATEWAY_AUTH_TOKEN = f"Bearer {ONLY_TOKEN}"
+# TOKENS - set when Request called to this base
+GATEWAY_AUTH_TOKEN = None
 
 # encrypting secret using RSA PCKS
 def getEncryptedText(rsaKey, secret):
@@ -31,6 +30,25 @@ def getEncryptedText(rsaKey, secret):
 @app.route('/')
 def home():
     return jsonify(summary = {"Home": "Home v4"})
+
+# -------------------- RUN FOR AUTH TOKEN --------------------#
+@app.route('/get-token', methods=['GET'])
+def get_gateway_token():
+    print("-- GATEWAY TOKEN GET! --")
+
+    sessions_url = f"{GATEWAY_HOST}/v0.5/sessions"
+    payload = json.dumps({
+        "clientId": "SBX_002007",
+        "clientSecret": "00df942f-402b-4c85-87d4-92e99120f94c"
+    })
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("GET", sessions_url, headers=headers, data=payload)
+    global GATEWAY_AUTH_TOKEN
+    GATEWAY_AUTH_TOKEN = f"Bearer {response.json.accessToken}"
+
+    return response
 
 # ---------------------------- HIP ---------------------------#
 #   LINKING CARE CONTEXTS URLs
@@ -76,16 +94,14 @@ def con_hip_notify():
     con_art_resp_req_id = req_data['requestId']
     cbl_url = f"{GATEWAY_HOST}/v0.5/consents/hip/on-notify"
     req_id = str(uuid.uuid4())
-    tstmp = datetime.datetime.utcnow().isoformat()
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
     payload = json.dumps({
         "requestId": req_id,
         "timestamp": tstmp,
-        "acknowledgement": [
-            {
+        "acknowledgement":{
                 "status": "OK",
                 "consentId": con_art_id
-            }
-        ],
+        },
         "error": {
             "code": 1000,
             "message": "string"
@@ -157,7 +173,7 @@ def con_hiu_notify():
     con_art_resp_req_id = req_data['requestId']
     cbl_url = f"{GATEWAY_HOST}/v0.5/consents/hiu/on-notify"
     req_id = str(uuid.uuid4())
-    tstmp = datetime.datetime.utcnow().isoformat()
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
     payload = json.dumps({
         "requestId": req_id,
         "timestamp": tstmp,
@@ -256,7 +272,6 @@ cQIDAQAB
     public_key = text.replace('\n','').split('-----')[2]
     encrypted_secret = getEncryptedText(public_key, secret)
 
-    print(encrypted_secret)
     return jsonify({"encSecret": encrypted_secret})
 
 
