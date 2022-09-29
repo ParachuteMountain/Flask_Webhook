@@ -61,7 +61,7 @@ def pat_init_cc_link_disc():
     # Check: F:\AbPt_ABDM\Theoretical_Info\FHIR\CC+FHIR\HIP_CC file
     # =================== YOU MUST GIVE MASKED DETAILS FOR CARE CONTEXTS ================
     # Give patient info if found (even with 0 CC) 
-    # else add the usual 'error' key-value pair (check sandbox for this URL as example)
+    # else add the usual 'error' key-value pair (check sandbox of this URL as example)
 
     # we must reply with on-discover as an HIP
     cbl_url = f"{GATEWAY_HOST}/v0.5/care-contexts/on-discover"
@@ -138,7 +138,7 @@ def pat_init_cc_link_init():
     # ONLY THEN MOVE FORWARD
 
     # Give patient info if found (even with 0 CC) 
-    # else add the usual 'error' key-value pair (check sandbox for this URL as example)
+    # else add the usual 'error' key-value pair (check sandbox of this URL as example)
 
     pat_dets = req_data['patient']     # will be used later - has the care context to link
     prev_req_id = req_data['requestId']
@@ -155,7 +155,7 @@ def pat_init_cc_link_init():
             "authenticationType": "DIRECT",
             "meta": {
                 "communicationMedium": "MOBILE",
-                "communicationHint": "string",
+                "communicationHint": "OTP on Reg. Mob. XXXXXXXX94", # can also add patient health ID to be more exact
                 "communicationExpiry": comm_exp
             }
         },
@@ -172,6 +172,12 @@ def pat_init_cc_link_init():
     print(on_init_resp)
 
     return jsonify(summary = {"HIP CC": "Links Init"})
+
+@app.route('/v0.5/links/link/confirm', methods=['POST'])
+def pat_init_cc_link_confirm():
+    print("HIP LOG: Patient initiated links confirm received!")
+    print(request.json)
+    return jsonify(summary = {"HIP CC": "Links Confirm"})
 
 #   HIP INITIATED LINKING CARE CONTEXTS URLs
 @app.route('/v0.5/users/auth/on-fetch-modes', methods=['POST'])
