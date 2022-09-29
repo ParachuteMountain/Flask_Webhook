@@ -100,7 +100,7 @@ def care_cont_disc():
         'Content-Type': 'application/json'
     }
     on_disc_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
-    print(on_disc_resp.json())
+    print(on_disc_resp)
 
     return jsonify(summary = {"HIP CC": "Discovery"})
 
