@@ -62,7 +62,7 @@ def care_cont_disc():
     # Check: F:\AbPt_ABDM\Theoretical_Info\FHIR\CC+FHIR\HIP_CC file
 
     # we must reply with on-discover as an HIP
-    cbl_url = "/v0.5/care-contexts/on-discover"
+    cbl_url = f"{GATEWAY_HOST}/v0.5/care-contexts/on-discover"
     req_data = request.json
     trxn_id = req_data['transactionId']
     prev_req_id = req_data['requestId']
