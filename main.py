@@ -115,6 +115,10 @@ def pat_init_cc_link_disc():
     # gives no content 202 response
     print(on_disc_resp)
 
+    # 2 MORE THINGS TO DO:
+    #   1. Save transactionId and remember who did it and it was for discovery
+    #   2. Also, send OTP to patient and save and confirm that ourselves
+
     return jsonify(summary = {"HIP CC": "Discovery"})
 
 @app.route('/v0.5/links/link/init', methods=['POST'])
@@ -122,7 +126,50 @@ def pat_init_cc_link_init():
     print("HIP LOG: Patient initiated links init received!")
     print(request.json)
 
-    
+    # we must reply with on-discover as an HIP
+    cbl_url = f"{GATEWAY_HOST}/v0.5/links/link/on-init"
+    req_data = request.json
+    trxn_id = req_data['transactionId']
+
+    # 2 THINGS TO DO:
+    #   1. CONFIRM THIS trxn_id matches transactionId saved in discovery
+    #   2. Also, confirm OTP sent is properly entered by patient
+    #       - Send token as a success to the OTP validation
+    # ONLY THEN MOVE FORWARD
+
+    # Give patient info if found (even with 0 CC) 
+    # else add the usual 'error' key-value pair (check sandbox for this URL as example)
+
+    pat_dets = req_data['patient']     # will be used later - has the care context to link
+    prev_req_id = req_data['requestId']
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+    comm_exp_nonutc = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
+    comm_exp = comm_exp_nonutc.isoformat()[:-3]+'Z'
+    payload = json.dumps({
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "transactionId": trxn_id,
+        "link": {
+            "referenceNumber": "PAT_INIT_LINK_29_SEPT_2022",
+            "authenticationType": "DIRECT",
+            "meta": {
+                "communicationMedium": "MOBILE",
+                "communicationHint": "string",
+                "communicationExpiry": comm_exp
+            }
+        },
+        "resp": {
+            "requestId": prev_req_id
+        }
+    })
+    headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx'
+    }
+    on_init_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
+    # gives no content 202 response
+    print(on_init_resp)
 
     return jsonify(summary = {"HIP CC": "Links Init"})
 
