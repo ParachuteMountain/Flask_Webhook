@@ -59,6 +59,7 @@ def care_cont_disc():
     # first do some searching in the HRP itself based on request.json data information
     # Get the care contexts for the patient using Fuzzy Match
     # Check: F:\AbPt_ABDM\Theoretical_Info\FHIR\CC+FHIR\HIP_CC file
+    # Give patient info if found (even with 0 CC) else if there were errors addd to error
 
     # we must reply with on-discover as an HIP
     cbl_url = f"{GATEWAY_HOST}/v0.5/care-contexts/on-discover"
@@ -71,7 +72,6 @@ def care_cont_disc():
         "requestId": req_id,
         "timestamp": tstmp,
         "transactionId": trxn_id,
-        # PATIENT INFO - if available (even with 0 care contexts)
         "patient": {
             "referenceNumber": "AP_Demo_4",
             "display": "Abhishek Patil",
@@ -85,7 +85,6 @@ def care_cont_disc():
                 "MOBILE"
             ]
         },
-        # ERRORS IN PRIOR REQUEST
         "error": {
             "code": 1000,
             "message": "string"
@@ -100,7 +99,7 @@ def care_cont_disc():
         'Content-Type': 'application/json'
     }
     on_disc_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
-    print(on_disc_resp)
+    print(dir(on_disc_resp))
 
     return jsonify(summary = {"HIP CC": "Discovery"})
 
