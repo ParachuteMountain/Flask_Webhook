@@ -51,7 +51,14 @@ def get_gateway_token():
     return response.json()
 
 # ---------------------------- HIP ---------------------------#
-#   LINKING CARE CONTEXTS URLs
+#   PATIENT INITIATED LINKING
+@app.route('/v0.5/care-contexts/discover', methods=['POST'])
+def care_cont_disc():
+    print("HIP LOG: Care contexts discovery received!")
+    print(request.json)
+    return jsonify(summary = {"HIP CC": "Discovery"})
+
+#   HIP INITIATED LINKING CARE CONTEXTS URLs
 @app.route('/v0.5/users/auth/on-fetch-modes', methods=['POST'])
 def auth_on_fetch_modes():
     print("HIP LOG: Auth on fetch modes received!")
