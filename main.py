@@ -15,22 +15,6 @@ MAIN_URL = "https://dev.abdm.gov.in"
 GATEWAY_HOST = f"{MAIN_URL}/gateway"
 CM_URL = f"{MAIN_URL}/cm"
 
-# TOKENS - set when Request called to this base
-GATEWAY_AUTH_TOKEN = None
-
-# encrypting secret using RSA PCKS
-def getEncryptedText(rsaKey, secret):
-    keyDER = base64.b64decode(rsaKey)
-    keyPub = RSA.importKey(keyDER)
-    cipherRSA = PKCS1_v1_5.new(keyPub)
-    ciphertext = cipherRSA.encrypt(str.encode(secret))
-    emsg = base64.b64encode(ciphertext)
-    return emsg.decode()
-
-@app.route('/')
-def home():
-    return jsonify(summary = {"Home": "Home v8"})
-
 # -------------------- RUN FOR AUTH TOKEN --------------------#
 @app.route('/get-token', methods=['GET'])
 def get_gateway_token():
@@ -49,6 +33,21 @@ def get_gateway_token():
     GATEWAY_AUTH_TOKEN = f"Bearer {response.json()['accessToken']}"
 
     return response.json()
+# TOKENS - set when Request called to this base
+GATEWAY_AUTH_TOKEN = f"Bearer {get_gateway_token()['accessToken']}"
+
+# encrypting secret using RSA PCKS
+def getEncryptedText(rsaKey, secret):
+    keyDER = base64.b64decode(rsaKey)
+    keyPub = RSA.importKey(keyDER)
+    cipherRSA = PKCS1_v1_5.new(keyPub)
+    ciphertext = cipherRSA.encrypt(str.encode(secret))
+    emsg = base64.b64encode(ciphertext)
+    return emsg.decode()
+
+@app.route('/')
+def home():
+    return jsonify(summary = {"Home": "Home v8"})
 
 # ---------------------------- HIP ---------------------------#
 #   PATIENT INITIATED LINKING
@@ -100,7 +99,8 @@ def care_cont_disc():
         'X-CM-ID': 'sbx',
         'Content-Type': 'application/json'
     }
-    response = requests.request("POST", cbl_url, headers=headers, data=payload)
+    on_disc_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
+    print(on_disc_resp.json())
 
     return jsonify(summary = {"HIP CC": "Discovery"})
 
