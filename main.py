@@ -59,7 +59,7 @@ def care_cont_disc():
     # first do some searching in the HRP itself based on request.json data information
     # Get the care contexts for the patient using Fuzzy Match
     # Check: F:\AbPt_ABDM\Theoretical_Info\FHIR\CC+FHIR\HIP_CC file
-    # =================== YOU MUST GIVE MASKED DETAILS ================
+    # =================== YOU MUST GIVE MASKED DETAILS FOR CARE CONTEXTS ================
     # Give patient info if found (even with 0 CC) 
     # else add the usual 'error' key-value pair (check sandbox for this URL as example)
 
@@ -79,24 +79,24 @@ def care_cont_disc():
             "display": "Abhishek Patil",
             "careContexts": [
                 {
-                    "referenceNumber": "AP_D_1_CC_1",
-                    "display": "Abhishek Patil D1CC1"
+                    "referenceNumber": "AP_D_XXXXXX",
+                    "display": "AbhXXXXX PaXXX D1XXX"
                 },
                 {
-                    "referenceNumber": "AP_D_2_CC_1",
-                    "display": "Abhishek Patil D2CC1"
+                    "referenceNumber": "AP_D_XXXXXX",
+                    "display": "AbhXXXXX PaXXX D2XXX"
                 },
                 {
-                    "referenceNumber": "AP_D_3_CC_3",
-                    "display": "AP D3CC3"
+                    "referenceNumber": "AP_D_XXXXXX",
+                    "display": "AP D3XXX"
                 },
                 {
-                    "referenceNumber": "AP_D_4_CC_4",
-                    "display": "AP D4CC4"
+                    "referenceNumber": "AP_D_XXXXXX",
+                    "display": "AP D4XXX"
                 },
                 {
-                    "referenceNumber": "AP_D_1_CC_2",
-                    "display": "AP D1CC2"
+                    "referenceNumber": "AP_D_XXXXXX",
+                    "display": "AP D1XXX"
                 }
             ],
             "matchedBy": [
