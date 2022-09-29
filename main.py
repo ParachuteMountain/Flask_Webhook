@@ -117,6 +117,15 @@ def care_cont_disc():
 
     return jsonify(summary = {"HIP CC": "Discovery"})
 
+@app.route('/v0.5/links/link/init', methods=['POST'])
+def care_cont_disc():
+    print("HIP LOG: Patient initiated links init received!")
+    print(request.json)
+
+    
+
+    return jsonify(summary = {"HIP CC": "Links Init"})
+
 #   HIP INITIATED LINKING CARE CONTEXTS URLs
 @app.route('/v0.5/users/auth/on-fetch-modes', methods=['POST'])
 def auth_on_fetch_modes():
