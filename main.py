@@ -85,10 +85,6 @@ def care_cont_disc():
                 "MOBILE"
             ]
         },
-        "error": {
-            "code": 1000,
-            "message": "string"
-        },
         "resp": {
             "requestId": prev_req_id
         }
@@ -99,7 +95,7 @@ def care_cont_disc():
         'Content-Type': 'application/json'
     }
     on_disc_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
-    print(dir(on_disc_resp))
+    print(on_disc_resp)
 
     return jsonify(summary = {"HIP CC": "Discovery"})
 
