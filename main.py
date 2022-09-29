@@ -60,7 +60,8 @@ def care_cont_disc():
     # Get the care contexts for the patient using Fuzzy Match
     # Check: F:\AbPt_ABDM\Theoretical_Info\FHIR\CC+FHIR\HIP_CC file
     # =================== YOU MUST GIVE MASKED DETAILS ================
-    # Give patient info if found (even with 0 CC) else if there were errors addd to error
+    # Give patient info if found (even with 0 CC) 
+    # else add the usual 'error' key-value pair (check sandbox for this URL as example)
 
     # we must reply with on-discover as an HIP
     cbl_url = f"{GATEWAY_HOST}/v0.5/care-contexts/on-discover"
@@ -74,12 +75,12 @@ def care_cont_disc():
         "timestamp": tstmp,
         "transactionId": trxn_id,
         "patient": {
-            "referenceNumber": "AP_Demo_4",
+            "referenceNumber": "AP_Demo_1",
             "display": "Abhishek Patil",
             "careContexts": [
                 {
-                    "referenceNumber": "AP_D_4_CC_4",
-                    "display": "AP D4CC4"
+                    "referenceNumber": "AP_D_3_CC_3",
+                    "display": "AP D3CC3"
                 }
             ],
             "matchedBy": [
@@ -96,7 +97,7 @@ def care_cont_disc():
         'Content-Type': 'application/json'
     }
     on_disc_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
-    print(on_disc_resp.json)
+    print(on_disc_resp.json())
 
     return jsonify(summary = {"HIP CC": "Discovery"})
 
