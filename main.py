@@ -56,6 +56,52 @@ def get_gateway_token():
 def care_cont_disc():
     print("HIP LOG: Care contexts discovery received!")
     print(request.json)
+
+    # first do some searching in the HRP itself based on request.json data information
+    # Get the care contexts for the patient using Fuzzy Match
+    # Check: F:\AbPt_ABDM\Theoretical_Info\FHIR\CC+FHIR\HIP_CC file
+
+    # we must reply with on-discover as an HIP
+    cbl_url = "/v0.5/care-contexts/on-discover"
+    req_data = request.json
+    trxn_id = req_data['transactionId']
+    prev_req_id = req_data['requestId']
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+    payload = json.dumps({
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "transactionId": trxn_id,
+        # PATIENT INFO - if available (even with 0 care contexts)
+        "patient": {
+            "referenceNumber": "AP_Demo_4",
+            "display": "Abhishek Patil",
+            "careContexts": [
+                {
+                    "referenceNumber": "AP_D_4_CC_4",
+                    "display": "AP D4CC4"
+                }
+            ],
+            "matchedBy": [
+                "MOBILE"
+            ]
+        },
+        # ERRORS IN PRIOR REQUEST
+        "error": {
+            "code": 1000,
+            "message": "string"
+        },
+        "resp": {
+            "requestId": prev_req_id
+        }
+    })
+    headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx',
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("POST", cbl_url, headers=headers, data=payload)
+
     return jsonify(summary = {"HIP CC": "Discovery"})
 
 #   HIP INITIATED LINKING CARE CONTEXTS URLs
