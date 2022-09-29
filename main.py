@@ -109,11 +109,10 @@ def care_cont_disc():
     })
     headers = {
         'Authorization': GATEWAY_AUTH_TOKEN,
-        'X-CM-ID': 'sbx',
-        'Content-Type': 'application/json'
+        'X-CM-ID': 'sbx'
     }
     on_disc_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
-    print(on_disc_resp.json)
+    print(on_disc_resp.json())
 
     return jsonify(summary = {"HIP CC": "Discovery"})
 
