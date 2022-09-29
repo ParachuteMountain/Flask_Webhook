@@ -140,7 +140,9 @@ def pat_init_cc_link_init():
     # Give patient info if found (even with 0 CC) 
     # else add the usual 'error' key-value pair (check sandbox of this URL as example)
 
-    pat_dets = req_data['patient']     # will be used later - has the care context to link
+    # both the details of patient and the CCs to add should be remembered for on-confirm in the next step
+    pat_dets = req_data['patient']
+    cc_to_add_dets_list = pat_dets['careContexts']
     prev_req_id = req_data['requestId']
     req_id = str(uuid.uuid4())
     tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
@@ -177,6 +179,50 @@ def pat_init_cc_link_init():
 def pat_init_cc_link_confirm():
     print("HIP LOG: Patient initiated links confirm received!")
     print(request.json)
+
+    # we must reply with on-confirm as an HIP
+    cbl_url = f"{GATEWAY_HOST}/v0.5/links/link/on-confirm"
+    req_data = request.json
+    prev_req_id = req_data['requestId']
+    conf_link_ref_num = req_data['confirmation']['linkRefNumber']
+    conf_token = req_data['confirmation']['token']
+
+    # Once we get link ref num and token in request.json we do the following:
+    # 1. The link reference number
+    #   - must be same for this patient - as given in on-init URL call (previous step)
+    # 2. The token
+    #   - must be same one as sent
+    #   - must be from same CM
+    # 3. Results of unmasked linked care contexts with patient reference number
+    # Recheck the sandbox of this URL for additional understanding if needed
+
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+    payload = json.dumps({
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "patient": {
+            "referenceNumber": "AP_Demo_1",
+            "display": "Abhishek Patil",
+            "careContexts": [
+                {
+                    "referenceNumber": "PAT_AP_D1CC5",
+                    "display": "Patient Init D1 CC5"    # this display might not come from patient so will need to fill with meaningful text
+                }
+            ]
+        },
+        "resp": {
+            "requestId": prev_req_id
+        }
+    })
+    headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx'
+    }
+    on_conf_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
+    # gives no content 202 response
+    print(on_conf_resp)
+
     return jsonify(summary = {"HIP CC": "Links Confirm"})
 
 #   HIP INITIATED LINKING CARE CONTEXTS URLs
