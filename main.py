@@ -52,7 +52,7 @@ def home():
 # ---------------------------- HIP ---------------------------#
 #   PATIENT INITIATED LINKING
 @app.route('/v0.5/care-contexts/discover', methods=['POST'])
-def care_cont_disc():
+def pat_init_cc_link_disc():
     print("HIP LOG: Care contexts discovery received!")
     print(request.json)
 
@@ -118,7 +118,7 @@ def care_cont_disc():
     return jsonify(summary = {"HIP CC": "Discovery"})
 
 @app.route('/v0.5/links/link/init', methods=['POST'])
-def care_cont_disc():
+def pat_init_cc_link_init():
     print("HIP LOG: Patient initiated links init received!")
     print(request.json)
 
