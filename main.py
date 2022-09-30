@@ -29,6 +29,8 @@ def get_gateway_token():
         'Content-Type': 'application/json'
     }
     response = requests.request('POST', sessions_url, headers=headers, data=payload)
+    print(response)
+    print(response.json())
     global GATEWAY_AUTH_TOKEN
     GATEWAY_AUTH_TOKEN = f"Bearer {response.json()['accessToken']}"
 
