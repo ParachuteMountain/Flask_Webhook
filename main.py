@@ -175,6 +175,10 @@ def pat_init_cc_link_confirm():
     # 3. Results of unmasked linked care contexts with patient reference number
     # Recheck the sandbox of this URL for additional understanding if needed
 
+    # There is a case where a user is never found.
+    # Then, create a reference ID and name for them and pass it below to start linking.
+    # Obviously, keep empty care contexts.
+
     req_id = str(uuid.uuid4())
     tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
     payload = json.dumps({
@@ -270,6 +274,7 @@ def con_hip_notify():
     }
     response = requests.request("POST", cbl_url, headers=headers, data=payload)
     print("--------- HIP LOG: HIP has sent on-notify to CM ----------")
+    print(response)
     print(f"HIP LOG: On-notify req ID {req_id}")
     print(f"HIP LOG: On-notify timestamp {tstmp}")
     print(f"-----------------------------------")
@@ -351,6 +356,7 @@ def con_hiu_notify():
     }
     response = requests.request("POST", cbl_url, headers=headers, data=payload)
     print("--------- HIU LOG: HIU has sent on-notify to CM ----------")
+    print(response)
     print(f"HIU LOG: On-notify req ID {req_id}")
     print(f"HIU LOG: On-notify timestamp {tstmp}")
     print(f"-----------------------------------")
