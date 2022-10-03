@@ -75,8 +75,8 @@ def pat_init_cc_link_disc():
         "timestamp": tstmp,
         "transactionId": trxn_id,
         "patient": {
-            "referenceNumber": None,
-            "display": None,
+            "referenceNumber": "FL_Demo_1",
+            "display": "Firsttest Lasttest",
             "careContexts": [],
             "matchedBy": [
                 "MOBILE"
@@ -182,7 +182,7 @@ def pat_init_cc_link_confirm():
         "timestamp": tstmp,
         "patient": {
             "referenceNumber": "FL_Demo_1",
-            "display": "Firstname Lastname",
+            "display": "Firsttest Lasttest",
             "careContexts": [
                 {
                     "referenceNumber": "PAT_FL_D1CC1",
