@@ -76,8 +76,8 @@ def pat_init_cc_link_disc():
         "timestamp": tstmp,
         "transactionId": trxn_id,
         "patient": {
-            "referenceNumber": NULL,
-            "display": NULL,
+            "referenceNumber": None,
+            "display": None,
             "careContexts": [],
             "matchedBy": [
                 "MOBILE"
@@ -133,11 +133,11 @@ def pat_init_cc_link_init():
         "timestamp": tstmp,
         "transactionId": trxn_id,
         "link": {
-            "referenceNumber": "PAT_INIT_LINK_29_SEPT_2022",
+            "referenceNumber": "PAT_INIT_LINK_10_OCT_2022",
             "authenticationType": "DIRECT",
             "meta": {
                 "communicationMedium": "MOBILE",
-                "communicationHint": "OTP on Reg. Mob. XXXXXXXX94", # can also add patient health ID to be more exact
+                "communicationHint": "OTP on Reg. Mob. XXXXXXXX76", # can also add patient health ID to be more exact
                 "communicationExpiry": comm_exp
             }
         },
@@ -182,12 +182,12 @@ def pat_init_cc_link_confirm():
         "requestId": req_id,
         "timestamp": tstmp,
         "patient": {
-            "referenceNumber": "AP_Demo_1",
-            "display": "Abhishek Patil",
+            "referenceNumber": "FL_Demo_1",
+            "display": "Firstname Lastname",
             "careContexts": [
                 {
-                    "referenceNumber": "PAT_AP_D1CC5",
-                    "display": "Patient Init D1 CC5"    # this display might not come from patient so will need to fill with meaningful text
+                    "referenceNumber": "PAT_FL_D1CC1",
+                    "display": "Patient Init D1 CC1"    # this display might not come from patient so will need to fill with meaningful text
                 }
             ]
         },
