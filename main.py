@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from flask import Flask, request, Response, render_template, jsonify
 
 from Cryptodome.PublicKey import RSA
@@ -75,30 +76,9 @@ def pat_init_cc_link_disc():
         "timestamp": tstmp,
         "transactionId": trxn_id,
         "patient": {
-            "referenceNumber": "AP_Demo_1",
-            "display": "Abhishek Patil",
-            "careContexts": [
-                {
-                    "referenceNumber": "AP_D_XXXXXX",
-                    "display": "AbhXXXXX PaXXX D1XXX"
-                },
-                {
-                    "referenceNumber": "AP_D_XXXXXX",
-                    "display": "AbhXXXXX PaXXX D2XXX"
-                },
-                {
-                    "referenceNumber": "AP_D_XXXXXX",
-                    "display": "AP D3XXX"
-                },
-                {
-                    "referenceNumber": "AP_D_XXXXXX",
-                    "display": "AP D4XXX"
-                },
-                {
-                    "referenceNumber": "AP_D_XXXXXX",
-                    "display": "AP D1XXX"
-                }
-            ],
+            "referenceNumber": NULL,
+            "display": NULL,
+            "careContexts": [],
             "matchedBy": [
                 "MOBILE"
             ]
