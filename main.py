@@ -259,10 +259,6 @@ def con_hip_notify():
                 "status": "OK",
                 "consentId": con_art_id
         },
-        "error": {
-            "code": 1000,
-            "message": "string"
-        },
         "resp": {
             "requestId": con_art_resp_req_id
         }
