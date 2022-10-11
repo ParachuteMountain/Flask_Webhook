@@ -256,8 +256,8 @@ def con_hip_notify():
         "requestId": req_id,
         "timestamp": tstmp,
         "acknowledgement":{
-                "status": "OK",
-                "consentId": con_art_id
+            "status": "OK",
+            "consentId": con_art_id
         },
         "resp": {
             "requestId": con_art_resp_req_id
@@ -281,6 +281,11 @@ def con_hip_notify():
 def hi_request():
     print("HIP LOG: HI request received!")
     print(request.json)
+
+    # Capture the transaction ID
+    req_data = request.json
+    hi_req_trxnId = req_data['transactionId']
+
     return jsonify(summary = {"HIP HI": "Request"})
 
 #   SUBSCRIPTION REQUESTS URLs
