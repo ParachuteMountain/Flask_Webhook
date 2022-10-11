@@ -282,9 +282,15 @@ def hi_request():
     print("HIP LOG: HI request received!")
     print(request.json)
 
-    # Capture the transaction ID
+    # Capture information for bundle transfer
     req_data = request.json
     hi_req_trxnId = req_data['transactionId']
+    hi_req_info = req_data['hiRequest']
+    hi_req_consent = hi_req_info['consent']
+    hi_req_dataRange = hi_req_info['dateRange']
+    hi_req_dataPushUrl = hi_req_info['dataPushUrl']
+    hi_req_keyMaterial = hi_req_info['keyMaterial']
+
 
     return jsonify(summary = {"HIP HI": "Request"})
 
