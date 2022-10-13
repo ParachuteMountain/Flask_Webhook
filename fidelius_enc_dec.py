@@ -1,24 +1,31 @@
 import os
 import uuid
 import json
-import subprocess
+# import subprocess
 
 binPath = "ENC_DEC_fidelius-cli/examples/fidelius-cli-1.2.0/bin/fidelius-cli"
 
-def execFideliusCli(args):
-    fideliusCommand = [binPath] + args
-    result = subprocess.run(
-        fideliusCommand, stdout=subprocess.PIPE, encoding='UTF-8', shell=True
-    )
-    try:
-        return json.loads(result.stdout)
-    except:
-        print(
-            f'ERROR · execFideliusCli · Command: {" ".join(args)}\n{result.stdout}'
-        )
+# def execFideliusCli(args):
+#     fideliusCommand = [binPath] + args
+#     result = subprocess.run(
+#         fideliusCommand, stdout=subprocess.PIPE, encoding='UTF-8', shell=True
+#     )
+#     try:
+#         return json.loads(result.stdout)
+#     except:
+#         print(
+#             f'ERROR · execFideliusCli · Command: {" ".join(args)}\n{result.stdout}'
+#         )
 
 def getEcdhKeyMaterial():
-    result = execFideliusCli(['gkm'])
+    # result = execFideliusCli(['gkm'])
+    # Can't use subprocess in flask so we will just hard code some encryption value for now
+    result = {
+        "privateKey": "CZ6Y/f4Ht+C7m3WufYDBa9RIT7ujI7+5FEj7hSiL0w8=",
+        "publicKey": "BEUNCQ6gZLmYy06b5FQCcC1CJbDVFSdimVfBssegTH5VDks6MEV35tKHqth87Ov+ipfGRMUC9kwxBQafDVYpUnw=",
+        "x509PublicKey": "MIIBMTCB6gYHKoZIzj0CATCB3gIBATArBgcqhkjOPQEBAiB/////////////////////////////////////////7TBEBCAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqYSRShRAQge0Je0Je0Je0Je0Je0Je0Je0Je0Je0Je0JgtenHcQyGQEQQQqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq0kWiCuGaG4oIa04B7dLHdI0UySPU1+bXxhsinpxaJ+ztPZAiAQAAAAAAAAAAAAAAAAAAAAFN753qL3nNZYEmMaXPXT7QIBCANCAARFDQkOoGS5mMtOm+RUAnAtQiWw1RUnYplXwbLHoEx+VQ5LOjBFd+bSh6rYfOzr/oqXxkTFAvZMMQUGnw1WKVJ8",
+        "nonce": "FlV9MfbcOFpifn9vLPeZGVViU61uNi6lqSeWj9r0PcY="
+    }
     return result
 
 def writeParamsToFile(*params):
@@ -42,7 +49,7 @@ def encryptData(encryptParams):
         encryptParams['senderPrivateKey'],
         encryptParams['requesterPublicKey']
     )
-    result = execFideliusCli(['-f', paramsFilePath])
+    # result = execFideliusCli(['-f', paramsFilePath])
     removeFileAtPath(paramsFilePath)
     return result
 
@@ -55,7 +62,7 @@ def decryptData(decryptParams):
         decryptParams['requesterPrivateKey'],
         decryptParams['senderPublicKey']
     )
-    result = execFideliusCli(['-f', paramsFilePath])
+    # result = execFideliusCli(['-f', paramsFilePath])
     removeFileAtPath(paramsFilePath)
     return result
 
