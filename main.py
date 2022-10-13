@@ -22,9 +22,6 @@ CM_URL = f"{MAIN_URL}/cm"
 def get_gateway_token():
     print("-- GATEWAY TOKEN GET! --")
 
-    # to remove - just check running of fideius
-    print(execFideliusCli("gkm"))
-
     sessions_url = f"{GATEWAY_HOST}/v0.5/sessions"
     payload = json.dumps({
         "clientId": "SBX_002007",
@@ -296,54 +293,54 @@ def hi_request():
     hi_req_dataPushUrl = hi_req_info['dataPushUrl']
     hi_req_keyMaterial = hi_req_info['keyMaterial']
 
-    # Open JSON FHIR file path and read data from it
-    f = open("OPCnsltNoteSmpl.json")
-    data = json.load(f)
-    f.close()
-    strData = json.dumps(data)
-    # create dictionary to pass outside pub key and nonce
-    outsidePubKeyMaterial = {
-        'nonce': hi_req_keyMaterial['nonce'],
-        'publicKey': hi_req_keyMaterial['dhPublicKey']['keyValue']
-    }
-    ret_val = runExample1(strData, outsidePubKeyMaterial)
-    enc_content = ret_val['content']
-    enc_snd_pub_key = ret_val['senderPubKeyVal']
-    enc_snd_nonce = ret_val['senderNonceVal']
+    # # Open JSON FHIR file path and read data from it
+    # f = open("OPCnsltNoteSmpl.json")
+    # data = json.load(f)
+    # f.close()
+    # strData = json.dumps(data)
+    # # create dictionary to pass outside pub key and nonce
+    # outsidePubKeyMaterial = {
+    #     'nonce': hi_req_keyMaterial['nonce'],
+    #     'publicKey': hi_req_keyMaterial['dhPublicKey']['keyValue']
+    # }
+    # ret_val = runExample1(strData, outsidePubKeyMaterial)
+    # enc_content = ret_val['content']
+    # enc_snd_pub_key = ret_val['senderPubKeyVal']
+    # enc_snd_nonce = ret_val['senderNonceVal']
 
-    # Preparing reply data
-    cbl_url = f"{hi_req_dataPushUrl}/v0.5/health-information/transfer"
-    dh_pub_key_exp = datetime.datetime.utcnow() + datetime.timedelta(hours=2)
-    dh_pub_key_exp = dh_pub_key_exp.isoformat()[:-3]+'Z'
-    payload = json.dumps({
-        "pageNumber": 1,
-        "pageCount": 1,
-        "transactionId": hi_req_trxnId,
-        "entries": [
-            {
-                "content": enc_content,
-                "media": "application/fhir+json",
-                "checksum": "string",
-                "careContextReference": "AP_D1_CC1"
-            }
-        ],
-        "keyMaterial": {
-            "cryptoAlg": "ECDH",
-            "curve": "Curve25519",
-            "dhPublicKey": {
-                "expiry": dh_pub_key_exp,
-                "parameters": "Curve25519/32byte random key",
-                "keyValue": enc_snd_pub_key
-            },
-            "nonce": enc_snd_nonce
-        }
-    })
-    headers = {
-        'Authorization': GATEWAY_AUTH_TOKEN,
-        'Content-Type': 'application/json'
-    }
-    response = requests.request("POST", cbl_url, headers=headers, data=payload)
-    print(response)
+    # # Preparing reply data
+    # cbl_url = f"{hi_req_dataPushUrl}/v0.5/health-information/transfer"
+    # dh_pub_key_exp = datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+    # dh_pub_key_exp = dh_pub_key_exp.isoformat()[:-3]+'Z'
+    # payload = json.dumps({
+    #     "pageNumber": 1,
+    #     "pageCount": 1,
+    #     "transactionId": hi_req_trxnId,
+    #     "entries": [
+    #         {
+    #             "content": enc_content,
+    #             "media": "application/fhir+json",
+    #             "checksum": "string",
+    #             "careContextReference": "AP_D1_CC1"
+    #         }
+    #     ],
+    #     "keyMaterial": {
+    #         "cryptoAlg": "ECDH",
+    #         "curve": "Curve25519",
+    #         "dhPublicKey": {
+    #             "expiry": dh_pub_key_exp,
+    #             "parameters": "Curve25519/32byte random key",
+    #             "keyValue": enc_snd_pub_key
+    #         },
+    #         "nonce": enc_snd_nonce
+    #     }
+    # })
+    # headers = {
+    #     'Authorization': GATEWAY_AUTH_TOKEN,
+    #     'Content-Type': 'application/json'
+    # }
+    # response = requests.request("POST", cbl_url, headers=headers, data=payload)
+    # print(response)
 
     return jsonify(summary = {"HIP HI": "Request"})
 
