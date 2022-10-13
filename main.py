@@ -22,6 +22,9 @@ CM_URL = f"{MAIN_URL}/cm"
 def get_gateway_token():
     print("-- GATEWAY TOKEN GET! --")
 
+    # to remove - just check running of fideius
+    print(execFideliusCli("gkm"))
+
     sessions_url = f"{GATEWAY_HOST}/v0.5/sessions"
     payload = json.dumps({
         "clientId": "SBX_002007",

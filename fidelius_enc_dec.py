@@ -3,7 +3,7 @@ import uuid
 import json
 import subprocess
 
-binPath = r"ENC_DEC_fidelius-cli\examples\fidelius-cli-1.2.0\bin\fidelius-cli"
+binPath = "ENC_DEC_fidelius-cli/examples/fidelius-cli-1.2.0/bin/fidelius-cli"
 
 def execFideliusCli(args):
     fideliusCommand = [binPath] + args
