@@ -9,15 +9,31 @@ import uuid
 import datetime
 import json
 import base64
+import subprocess
 
 app = Flask(__name__)
+
+def execFideliusCli(args):
+    fideliusCommand = [binPath] + args
+    result = subprocess.run(
+        fideliusCommand, stdout=subprocess.PIPE, encoding='UTF-8'
+    )
+    try:
+        return json.loads(result.stdout)
+    except:
+        print(
+            f'ERROR · execFideliusCli · Command: {" ".join(args)}\n{result.stdout}'
+        )
 
 # HOME PAGE / FIST PAGE
 @app.route('/')
 def home():
-    return jsonify(summary = {"Home": "Home v8"})
+    result = execFideliusCli(['gkm'])
+    print(result)
 
-# BASE URLs
+    return jsonify(summary = {"Home": "Home v9"})
+
+# ABDM BASE URLs
 MAIN_URL = "https://dev.abdm.gov.in"
 GATEWAY_HOST = f"{MAIN_URL}/gateway"
 CM_URL = f"{MAIN_URL}/cm"
