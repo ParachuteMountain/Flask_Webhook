@@ -12,6 +12,11 @@ import base64
 
 app = Flask(__name__)
 
+# HOME PAGE / FIST PAGE
+@app.route('/')
+def home():
+    return jsonify(summary = {"Home": "Home v8"})
+
 # BASE URLs
 MAIN_URL = "https://dev.abdm.gov.in"
 GATEWAY_HOST = f"{MAIN_URL}/gateway"
@@ -46,10 +51,6 @@ def getEncryptedText(rsaKey, secret):
     ciphertext = cipherRSA.encrypt(str.encode(secret))
     emsg = base64.b64encode(ciphertext)
     return emsg.decode()
-
-@app.route('/')
-def home():
-    return jsonify(summary = {"Home": "Home v8"})
 
 # ---------------------------- HIP ---------------------------#
 #   PATIENT INITIATED LINKING
