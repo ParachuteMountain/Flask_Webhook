@@ -15,25 +15,18 @@ import os
 app = Flask(__name__)
 
 def execFideliusCli(args):
-    cur_dir = os.getcwd()
-    print(cur_dir)
     fid_cli_dir = "./ENC_DEC_fidelius-cli/examples/fidelius-cli-1.2.0/bin/fidelius-cli"
-    print(fid_cli_dir)
-    print(os.path.exists(fid_cli_dir))
-
-    return None
-
-    # binPath = r"F:\AbPt_ABDM\Extras\ENC_DEC_fidelius-cli\examples\fidelius-cli-1.2.0\bin\fidelius-cli"
-    # fideliusCommand = [binPath] + args
-    # result = subprocess.run(
-    #     fideliusCommand, stdout=subprocess.PIPE, encoding='UTF-8'
-    # )
-    # try:
-    #     return json.loads(result.stdout)
-    # except:
-    #     print(
-    #         f'ERROR · execFideliusCli · Command: {" ".join(args)}\n{result.stdout}'
-    #     )
+    
+    fideliusCommand = [fid_cli_dir] + args
+    result = subprocess.run(
+        fideliusCommand, stdout=subprocess.PIPE, encoding='UTF-8'
+    )
+    try:
+        return json.loads(result.stdout)
+    except:
+        print(
+            f'ERROR · execFideliusCli · Command: {" ".join(args)}\n{result.stdout}'
+        )
 
 # HOME PAGE / FIST PAGE
 @app.route('/')
