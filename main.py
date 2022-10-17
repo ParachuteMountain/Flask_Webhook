@@ -21,6 +21,7 @@ def heroku_java_intall():
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
+    print(jdk_res1.returncode)
     if jdk_res1.returncode != 0:
         return False
     print(jdk_res1)
@@ -29,6 +30,7 @@ def heroku_java_intall():
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
+    print(jdk_res2.returncode)
     if jdk_res2.returncode != 0:
         return False
     print(jdk_res2)
@@ -37,6 +39,7 @@ def heroku_java_intall():
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
+    print(jdk_res3.returncode)
     if jdk_res3.returncode != 0:
         return False
     print(jdk_res3)
@@ -45,6 +48,7 @@ def heroku_java_intall():
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
+    print(jdk_res4.returncode)
     if jdk_res4.returncode != 0:
         return False
     print(jdk_res4)
@@ -53,6 +57,7 @@ def heroku_java_intall():
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
+    print(jdk_res5.returncode)
     if jdk_res5.returncode != 0:
         return False
     print(jdk_res5)    
@@ -61,13 +66,14 @@ def heroku_java_intall():
     print(os.environ)
 
     # check java version
-    jdk_res5 = subprocess.Popen('java -version',
+    jdk_res6 = subprocess.Popen('java -version',
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
-    if jdk_res5.returncode != 0:
+    print(jdk_res6.returncode)
+    if jdk_res6.returncode != 0:
         return False
-    print(jdk_res5.stdout)
+    print(jdk_res6.stdout)
     return True
 
 def execFideliusCli(args):
