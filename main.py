@@ -21,6 +21,8 @@ def execFideliusCli(args):
     # provide permission to run exec
     st = os.stat(fid_cli_dir)
     os.chmod(fid_cli_dir, st.st_mode | stat.S_IEXEC)
+
+    print(os.environ)
     
     fideliusCommand = [fid_cli_dir] + args
     result = subprocess.run(
