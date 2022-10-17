@@ -22,7 +22,7 @@ def execFideliusCli(args):
     st = os.stat(fid_cli_dir)
     os.chmod(fid_cli_dir, st.st_mode | stat.S_IEXEC)
 
-    print(os.environ)
+    # java installation
     jdk_res1 = subprocess.Popen('sudo add-apt-repository ppa:openjdk-r/ppa',
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
@@ -42,7 +42,11 @@ def execFideliusCli(args):
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
-    print(jdk_res4)
+    print(jdk_res4)   
+
+    # print environment variables
+    print(os.environ)
+    
     return None
     
     # fideliusCommand = [fid_cli_dir] + args
