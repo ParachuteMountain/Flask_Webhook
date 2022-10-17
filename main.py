@@ -19,7 +19,7 @@ def execFideliusCli(args):
     print(cur_dir)
     fid_cli_dir = "./ENC_DEC_fidelius-cli/examples/fidelius-cli-1.2.0/bin/fidelius-cli"
     print(fid_cli_dir)
-    print(os.exists(fid_cli_dir))
+    print(os.path.exists(fid_cli_dir))
 
     return None
 
