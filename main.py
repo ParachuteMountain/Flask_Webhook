@@ -17,7 +17,9 @@ app = Flask(__name__)
 def execFideliusCli(args):
     cur_dir = os.getcwd()
     print(cur_dir)
-    print(os.listdir())
+    fid_cli_dir = "./ENC_DEC_fidelius-cli/examples/fidelius-cli-1.2.0/bin/fidelius-cli"
+    print(fid_cli_dir)
+    print(os.exists(fid_cli_dir))
 
     return None
 
