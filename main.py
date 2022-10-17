@@ -11,11 +11,16 @@ import json
 import base64
 import subprocess
 import os
+import stat
 
 app = Flask(__name__)
 
 def execFideliusCli(args):
     fid_cli_dir = "./ENC_DEC_fidelius-cli/examples/fidelius-cli-1.2.0/bin/fidelius-cli"
+
+    # provide permission to run exec
+    st = os.stat(fid_cli_dir)
+    os.chmod(fid_cli_dir, st.st_mode | stat.S_IEXEC)
     
     fideliusCommand = [fid_cli_dir] + args
     result = subprocess.run(
