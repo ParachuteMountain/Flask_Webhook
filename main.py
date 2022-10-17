@@ -10,20 +10,28 @@ import datetime
 import json
 import base64
 import subprocess
+import os
 
 app = Flask(__name__)
 
 def execFideliusCli(args):
-    fideliusCommand = [binPath] + args
-    result = subprocess.run(
-        fideliusCommand, stdout=subprocess.PIPE, encoding='UTF-8'
-    )
-    try:
-        return json.loads(result.stdout)
-    except:
-        print(
-            f'ERROR · execFideliusCli · Command: {" ".join(args)}\n{result.stdout}'
-        )
+    cur_dir = os.getcwd()
+    print(cur_dir)
+    print(os.listdir())
+
+    return None
+
+    # binPath = r"F:\AbPt_ABDM\Extras\ENC_DEC_fidelius-cli\examples\fidelius-cli-1.2.0\bin\fidelius-cli"
+    # fideliusCommand = [binPath] + args
+    # result = subprocess.run(
+    #     fideliusCommand, stdout=subprocess.PIPE, encoding='UTF-8'
+    # )
+    # try:
+    #     return json.loads(result.stdout)
+    # except:
+    #     print(
+    #         f'ERROR · execFideliusCli · Command: {" ".join(args)}\n{result.stdout}'
+    #     )
 
 # HOME PAGE / FIST PAGE
 @app.route('/')
