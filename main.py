@@ -24,16 +24,16 @@ def execFideliusCli(args):
 
     print(os.environ)
     
-    fideliusCommand = [fid_cli_dir] + args
-    result = subprocess.run(
-        fideliusCommand, stdout=subprocess.PIPE, encoding='UTF-8'
-    )
-    try:
-        return json.loads(result.stdout)
-    except:
-        print(
-            f'ERROR · execFideliusCli · Command: {" ".join(args)}\n{result.stdout}'
-        )
+    # fideliusCommand = [fid_cli_dir] + args
+    # result = subprocess.run(
+    #     fideliusCommand, stdout=subprocess.PIPE, encoding='UTF-8'
+    # )
+    # try:
+    #     return json.loads(result.stdout)
+    # except:
+    #     print(
+    #         f'ERROR · execFideliusCli · Command: {" ".join(args)}\n{result.stdout}'
+    #     )
 
 # HOME PAGE / FIST PAGE
 @app.route('/')
@@ -48,26 +48,26 @@ MAIN_URL = "https://dev.abdm.gov.in"
 GATEWAY_HOST = f"{MAIN_URL}/gateway"
 CM_URL = f"{MAIN_URL}/cm"
 
-# -------------------- RUN FOR AUTH TOKEN --------------------#
-@app.route('/get-token', methods=['GET'])
-def get_gateway_token():
-    print("-- GATEWAY TOKEN GET! --")
+# # -------------------- RUN FOR AUTH TOKEN --------------------#
+# @app.route('/get-token', methods=['GET'])
+# def get_gateway_token():
+#     print("-- GATEWAY TOKEN GET! --")
 
-    sessions_url = f"{GATEWAY_HOST}/v0.5/sessions"
-    payload = json.dumps({
-        "clientId": "SBX_002007",
-        "clientSecret": "00df942f-402b-4c85-87d4-92e99120f94c"
-    })
-    headers = {
-        'Content-Type': 'application/json'
-    }
-    response = requests.request('POST', sessions_url, headers=headers, data=payload)
-    global GATEWAY_AUTH_TOKEN
-    GATEWAY_AUTH_TOKEN = f"Bearer {response.json()['accessToken']}"
+#     sessions_url = f"{GATEWAY_HOST}/v0.5/sessions"
+#     payload = json.dumps({
+#         "clientId": "SBX_002007",
+#         "clientSecret": "00df942f-402b-4c85-87d4-92e99120f94c"
+#     })
+#     headers = {
+#         'Content-Type': 'application/json'
+#     }
+#     response = requests.request('POST', sessions_url, headers=headers, data=payload)
+#     global GATEWAY_AUTH_TOKEN
+#     GATEWAY_AUTH_TOKEN = f"Bearer {response.json()['accessToken']}"
 
-    return response.json()
+#     return response.json()
 # TOKENS - set when Request called to this base
-GATEWAY_AUTH_TOKEN = f"Bearer {get_gateway_token()['accessToken']}"
+#GATEWAY_AUTH_TOKEN = f"Bearer {get_gateway_token()['accessToken']}"
 
 # encrypting secret using RSA PCKS
 def getEncryptedText(rsaKey, secret):
