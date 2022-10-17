@@ -23,8 +23,12 @@ def execFideliusCli(args):
     os.chmod(fid_cli_dir, st.st_mode | stat.S_IEXEC)
 
     print(os.environ)
-    jdk_res = subprocess.run(["sudo", "apt", "install", "openjdk-8-jdk"])
-    print(jdk_res)
+    jdk_res1 = subprocess.run(["sudo", "add-apt-repository", "ppa:openjdk-r/ppa"])
+    print(jdk_res1)
+    jdk_res2 = subprocess.run(["sudo", "apt", "update"])
+    print(jdk_res2)
+    jdk_res3 = subprocess.run(["sudo", "apt", "install", "openjdk-8-jdk"])
+    print(jdk_res3)
 
     return None
     
