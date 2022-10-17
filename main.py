@@ -21,6 +21,9 @@ def heroku_java_intall():
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
+    outs, errs = jdk_res1.communicate(timeout=10)
+    print(outs)
+    print(errs)
     print(jdk_res1.returncode)
     if jdk_res1.returncode != 0:
         return False
@@ -83,8 +86,11 @@ def execFideliusCli(args):
     st = os.stat(fid_cli_dir)
     os.chmod(fid_cli_dir, st.st_mode | stat.S_IEXEC)
 
-    if heroku_java_intall():
-        print("Java installed!")
+    heroku_java_intall()
+    # if heroku_java_intall():
+    #     print("Java installed!")
+    # else:
+    #     print("Java install failed")
 
     return None
     
