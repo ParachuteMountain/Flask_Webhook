@@ -18,7 +18,7 @@ app = Flask(__name__)
 def heroku_java_intall():
     # java installation
     jdk_res1 = subprocess.Popen('add-apt-repository ppa:openjdk-r/ppa',
-                        shell=True, stdin=subprocess.PIPE,
+                        shell=False, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
     outs, errs = jdk_res1.communicate(timeout=10)
