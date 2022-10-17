@@ -21,22 +21,41 @@ def heroku_java_isntall():
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
+    if jdk_res1.returncode != 0:
+        return False
     print(jdk_res1)
+
     jdk_res2 = subprocess.Popen('sudo apt update',
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
+    if jdk_res2.returncode != 0:
+        return False
     print(jdk_res2)
+
     jdk_res3 = subprocess.Popen('sudo apt install openjdk-8-jdk',
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
+    if jdk_res3.returncode != 0:
+        return False
     print(jdk_res3)
+
     jdk_res4 = subprocess.Popen('export JAVA_HOME=/usr/lib/jvm/java-8-openjdk',
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
-    print(jdk_res4)   
+    if jdk_res4.returncode != 0:
+        return False
+    print(jdk_res4)
+
+    jdk_res5 = subprocess.Popen('export PATH=$PATH:$JAVA_HOME/bin ',
+                        shell=True, stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE)
+    if jdk_res5.returncode != 0:
+        return False
+    print(jdk_res5)    
 
     # print environment variables
     print(os.environ)
@@ -46,8 +65,10 @@ def heroku_java_isntall():
                         shell=True, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
-    print(json.loads(jdk_res5.stdout))
-    pass
+    if jdk_res5.returncode != 0:
+        return False
+    print(jdk_res5.stdout)
+    return True
 
 def execFideliusCli(args):
     fid_cli_dir = "./ENC_DEC_fidelius-cli/examples/fidelius-cli-1.2.0/bin/fidelius-cli"
@@ -56,7 +77,8 @@ def execFideliusCli(args):
     st = os.stat(fid_cli_dir)
     os.chmod(fid_cli_dir, st.st_mode | stat.S_IEXEC)
 
-    heroku_java_isntall()
+    if heroku_java_isntall():
+        print("Java installed!")
 
     return None
     
