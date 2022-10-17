@@ -38,7 +38,11 @@ def execFideliusCli(args):
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
     print(jdk_res3)
-
+    jdk_res4 = subprocess.Popen('export JAVA_HOME=/usr/lib/jvm/java-8-openjdk',
+                        shell=True, stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE)
+    print(jdk_res4)
     return None
     
     # fideliusCommand = [fid_cli_dir] + args
