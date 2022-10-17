@@ -23,6 +23,10 @@ def execFideliusCli(args):
     os.chmod(fid_cli_dir, st.st_mode | stat.S_IEXEC)
 
     print(os.environ)
+    jdk_res = subprocess.run(["sudo", "apt", "install", "openjdk-8-jdk"])
+    print(jdk_res)
+
+    return None
     
     # fideliusCommand = [fid_cli_dir] + args
     # result = subprocess.run(
