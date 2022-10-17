@@ -15,13 +15,7 @@ import stat
 
 app = Flask(__name__)
 
-def execFideliusCli(args):
-    fid_cli_dir = "./ENC_DEC_fidelius-cli/examples/fidelius-cli-1.2.0/bin/fidelius-cli"
-
-    # provide permission to run exec
-    st = os.stat(fid_cli_dir)
-    os.chmod(fid_cli_dir, st.st_mode | stat.S_IEXEC)
-
+def heroku_java_isntall():
     # java installation
     jdk_res1 = subprocess.Popen('sudo add-apt-repository ppa:openjdk-r/ppa',
                         shell=True, stdin=subprocess.PIPE,
@@ -46,7 +40,24 @@ def execFideliusCli(args):
 
     # print environment variables
     print(os.environ)
-    
+
+    # check java version
+    jdk_res5 = subprocess.Popen('java -version',
+                        shell=True, stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE)
+    print(json.loads(jdk_res5.stdout))
+    pass
+
+def execFideliusCli(args):
+    fid_cli_dir = "./ENC_DEC_fidelius-cli/examples/fidelius-cli-1.2.0/bin/fidelius-cli"
+
+    # provide permission to run exec
+    st = os.stat(fid_cli_dir)
+    os.chmod(fid_cli_dir, st.st_mode | stat.S_IEXEC)
+
+    heroku_java_isntall()
+
     return None
     
     # fideliusCommand = [fid_cli_dir] + args
