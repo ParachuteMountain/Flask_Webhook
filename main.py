@@ -15,7 +15,7 @@ import stat
 
 app = Flask(__name__)
 
-def heroku_java_isntall():
+def heroku_java_intall():
     # java installation
     jdk_res1 = subprocess.Popen('sudo add-apt-repository ppa:openjdk-r/ppa',
                         shell=True, stdin=subprocess.PIPE,
@@ -77,7 +77,7 @@ def execFideliusCli(args):
     st = os.stat(fid_cli_dir)
     os.chmod(fid_cli_dir, st.st_mode | stat.S_IEXEC)
 
-    if heroku_java_isntall():
+    if heroku_java_intall():
         print("Java installed!")
 
     return None
