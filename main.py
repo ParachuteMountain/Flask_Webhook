@@ -56,6 +56,55 @@ def getEncryptedText(rsaKey, secret):
     return emsg.decode()
 
 # ---------------------------- HIP ---------------------------#
+# PATIENT's PROFILE SHARE
+@app.route('/v1.0/patients/profile/share', methods=['POST'])
+def pat_prof_share():
+    print("HIP LOG: Patient profile shared and received!")
+    print(request.json)
+
+    # callback to acknowledge successfull profile share    
+    cbl_url = f"{GATEWAY_HOST}/v1.0/patients/profile/on-share"
+    req_data = request.json
+    prev_req_id = req_data['requestId']
+    req_intent = req_data['intent']
+    req_location = req_data['location']
+    req_profile_hipCode = req_data['profile']['hipCode']
+    req_profile_patient = req_data['profile']['patient']
+    print(req_profile_patient)
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+    # Sample error code if failed
+    # "error": {
+    #     "code": 1000,
+    #     "message": "string"
+    # },
+    payload = json.dumps({
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "acknowledgement": {
+            "status": "SUCCESS",
+            "healthId": "<username>@<suffix>",
+            "tokenNumber": "string"
+        },
+        "resp": {
+            "requestId": prev_req_id
+        }
+    })
+    headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx'
+    }
+    on_share_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
+    print(on_share_resp)
+
+    # now use the req_profile_patient values like HID number and Demographics to verify
+    # rest of the API is using init with Demograhics: auth/fetch-modes -> auth/init -> 
+    #     auth/confirm -> link/add-contexts -> context/notify
+    # This is in Postman M1_Wise_APIs and will be called by the mobile app
+    # We will need to tell the app (or the HIP hospital application) to start the 
+    #     verification process and also pass the demographics info from here
+    # FILL THAT CODE HERE - an API call to the app
+
 #   PATIENT INITIATED LINKING
 @app.route('/v0.5/care-contexts/discover', methods=['POST'])
 def pat_init_cc_link_disc():
