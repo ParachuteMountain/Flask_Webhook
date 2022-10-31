@@ -105,6 +105,9 @@ def pat_prof_share():
     #     verification process and also pass the demographics info from here
     # FILL THAT CODE HERE - an API call to the app
 
+
+    return jsonify(summary = {"HIP Patient": "Prof Share"})
+
 #   PATIENT INITIATED LINKING
 @app.route('/v0.5/care-contexts/discover', methods=['POST'])
 def pat_init_cc_link_disc():
