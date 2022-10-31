@@ -83,8 +83,8 @@ def pat_prof_share():
         "timestamp": tstmp,
         "acknowledgement": {
             "status": "SUCCESS",
-            "healthId": "<username>@<suffix>",
-            "tokenNumber": "string"
+            "healthId": req_profile_patient['healthId'],
+            "tokenNumber": "1234567"
         },
         "resp": {
             "requestId": prev_req_id
