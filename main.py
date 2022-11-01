@@ -112,18 +112,20 @@ def pat_prof_share():
 @app.route('/v0.5/care-contexts/discover', methods=['POST'])
 def pat_init_cc_link_disc():
     print("HIP LOG: Care contexts discovery received!")
-    print(request.json)
+    req_data = request.json
+    print(req_data)
 
     # first do some searching in the HRP itself based on request.json data information
+    # req_data Example: {'patient': {'id': 'm1test.1092@sbx', 'name': 'Abhishek Suhasrao Patil', 'gender': 'M', 'yearOfBirth': 1996, 'verifiedIdentifiers': [{'type': 'MOBILE', 'value': '8976165694'}, {'type': 'NDHM_HEALTH_NUMBER', 'value': '91-3108-7321-4236'}, {'type': 'HEALTH_ID', 'value': 'm1test.1092@sbx'}], 'unverifiedIdentifiers': [{'type': 'MOBILE', 'value': '+917499094276'}]}, 'requestId': '8d795bc1-b464-4cb1-98f2-c1adab2631c2', 'timestamp': '2022-11-01T11:11:44.115743', 'transactionId': '245a7942-ba04-4dbf-85a5-96d718c88d37'}
+    # IMPORTANT: SAVE the ABHA ID for this patient in DB too!
     # Get the care contexts for the patient using Fuzzy Match
-    # Check: F:\AbPt_ABDM\Theoretical_Info\FHIR\CC+FHIR\HIP_CC file
+    # Check for more info: F:\AbPt_ABDM\FHIR\FHIR_Understanding\CC+FHIR\HIP_CC file
     # =================== YOU MUST GIVE MASKED DETAILS FOR CARE CONTEXTS ================
-    # Give patient info if found (even with 0 CC) 
+    # Give patient info if found (even with 0 CC) - MUST GIVE ALL RECORDS OVER THE YEARS!
     # else add the usual 'error' key-value pair (check sandbox of this URL as example)
 
     # we must reply with on-discover as an HIP
     cbl_url = f"{GATEWAY_HOST}/v0.5/care-contexts/on-discover"
-    req_data = request.json
     trxn_id = req_data['transactionId']
     prev_req_id = req_data['requestId']
     req_id = str(uuid.uuid4())
@@ -166,6 +168,7 @@ def pat_init_cc_link_init():
     # we must reply with on-discover as an HIP
     cbl_url = f"{GATEWAY_HOST}/v0.5/links/link/on-init"
     req_data = request.json
+    # req_data Example: {'requestId': '5066c19b-4ef2-4f13-8c6f-dede5d35ef25', 'timestamp': '2022-11-01T11:13:34.453199', 'transactionId': '245a7942-ba04-4dbf-85a5-96d718c88d37', 'patient': {'id': 'm1test.1092@sbx', 'referenceNumber': 'AP_Demo_1', 'careContexts': [{'referenceNumber': 'PAT_AP_D1CC1'}]}}
     trxn_id = req_data['transactionId']
 
     # 2 THINGS TO DO:
@@ -220,6 +223,7 @@ def pat_init_cc_link_confirm():
     # we must reply with on-confirm as an HIP
     cbl_url = f"{GATEWAY_HOST}/v0.5/links/link/on-confirm"
     req_data = request.json
+    # req_data Example: {'requestId': 'fe9cd614-e630-4ce1-9abe-cb690db19e08', 'timestamp': '2022-11-01T11:14:54.294276', 'confirmation': {'linkRefNumber': 'PAT_INIT_LINK_10_OCT_2022', 'token': 'test_token'}}
     prev_req_id = req_data['requestId']
     conf_link_ref_num = req_data['confirmation']['linkRefNumber']
     conf_token = req_data['confirmation']['token']
