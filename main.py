@@ -337,6 +337,13 @@ def link_on_notify():
     print(request.json)
     return jsonify(summary = {"HIP Link": "On Notify"})
 
+# LISTEN TO REPLY FOR ANY NOTIFICATION (including new data notif) FROM HIP
+@app.route('/v0.5/patients/sms/on-notify', methods=['POST'])
+def pat_sms_on_notify():
+    print("HIP LOG: Patients SMS no notify!")
+    print(request.json)
+    return jsonify(summary = {"HIP Pat SMS": "On Notify"})
+
 #   CONSENT REQUESTS URLs
 @app.route('/v0.5/consents/hip/notify', methods=['POST'])
 def con_hip_notify():
