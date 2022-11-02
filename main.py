@@ -98,8 +98,11 @@ def pat_prof_share():
     print(on_share_resp)
 
     # now use the req_profile_patient values like HID number and Demographics to verify
-    # rest of the API is using init with Demograhics: auth/fetch-modes -> auth/init -> 
-    #     auth/confirm -> link/add-contexts -> context/notify
+    # FIRST, save the health ID and patient demographics as usual in DB
+
+    # Then somewhere outside if we know we are doing this for verification (KYC) then we do 
+    # auth init with Demograhics:
+    #     auth/fetch-modes -> auth/init -> auth/confirm -> link/add-contexts -> context/notify
     # This is in Postman M1_Wise_APIs and will be called by the mobile app
     # We will need to tell the app (or the HIP hospital application) to start the 
     #     verification process and also pass the demographics info from here
@@ -107,6 +110,45 @@ def pat_prof_share():
 
 
     return jsonify(summary = {"HIP Patient": "Prof Share"})
+
+# PATIENT STATUS NOTIFY
+@app.route('/v0.5/patients/status/notify', methods=['POST'])
+def pat_status_notify():
+    print("HIP LOG: Patient status notify received!")
+    print(request.json)
+
+    # When we receive this we save a patient's status in the DB
+    # If active we can do other APIs else we report it as Deactivated / Deleted.
+
+    # callback to acknowledge successfull status receiving
+    cbl_url = f"{GATEWAY_HOST}/v0.5/patients/status/on-notify"
+    req_data = request.json
+    prev_req_id = req_data['requestId']
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+    # Sample error code if failed
+    # "error": {
+    #     "code": 1000,
+    #     "message": "string"
+    # },
+    payload = json.dumps({
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "acknowledgment": {
+            "status": "OK"
+        },
+        "resp": {
+            "requestId": prev_req_id
+        }
+    })
+    headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx'
+    }
+    on_notif_status_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
+    print(on_notif_status_resp)
+
+    return jsonify(summary = {"HIP Patient": "Status notify"})
 
 #   PATIENT INITIATED LINKING
 @app.route('/v0.5/care-contexts/discover', methods=['POST'])
@@ -165,7 +207,7 @@ def pat_init_cc_link_init():
     print("HIP LOG: Patient initiated links init received!")
     print(request.json)
 
-    # we must reply with on-discover as an HIP
+    # we must reply with on-init as an HIP
     cbl_url = f"{GATEWAY_HOST}/v0.5/links/link/on-init"
     req_data = request.json
     # req_data Example: {'requestId': '5066c19b-4ef2-4f13-8c6f-dede5d35ef25', 'timestamp': '2022-11-01T11:13:34.453199', 'transactionId': '245a7942-ba04-4dbf-85a5-96d718c88d37', 'patient': {'id': 'm1test.1092@sbx', 'referenceNumber': 'AP_Demo_1', 'careContexts': [{'referenceNumber': 'PAT_AP_D1CC1'}]}}
@@ -175,6 +217,7 @@ def pat_init_cc_link_init():
     #   1. CONFIRM THIS trxn_id matches transactionId saved in discovery
     #   2. Also, confirm OTP sent is properly entered by patient
     #       - Send token as a success to the OTP validation
+    #   3. Then confirm that the incoming care context is one of the values provided in discovery
     # ONLY THEN MOVE FORWARD
 
     # Give patient info if found (even with 0 CC) 
@@ -239,7 +282,7 @@ def pat_init_cc_link_confirm():
 
     # There is a case where a user is never found.
     # Then, create a reference ID and name for them and pass it below to start linking.
-    # Obviously, keep empty care contexts.
+    # Also in this case keep care contexts list empty.
 
     req_id = str(uuid.uuid4())
     tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
@@ -350,6 +393,11 @@ def con_hip_notify():
     print("HIP LOG: Con HIP notify received!")
     print(request.json)
 
+    # We can get GRANTED, REVOKED and even EXPIRED values
+    # FIRST, save the consent against ABHA Address for GRANTED
+    #    or delete existing ones for REVOKED/EXPIRED values
+    # THEN, send acknowledgement callback below
+
     # HIP ON-NOTIFY: quickly send callback to CM about acknowledgement
     req_data = request.json
     con_art_id = req_data['notification']['consentDetail']['consentId']
@@ -389,13 +437,38 @@ def hi_request():
 
     # Capture information for bundle transfer
     req_data = request.json
-    hi_req_trxnId = req_data['transactionId']
+    hi_req_trxnId = req_data['transactionId']  #### USE THIS IN DATA TRANSFER
     hi_req_info = req_data['hiRequest']
     hi_req_consent = hi_req_info['consent']
     hi_req_dataRange = hi_req_info['dateRange']
     hi_req_dataPushUrl = hi_req_info['dataPushUrl']
     hi_req_keyMaterial = hi_req_info['keyMaterial']
 
+    # Step 1: Ensure all information is upto standards and send ACK using hip/on-request
+    cbl_url = f"{hi_req_dataPushUrl}/v0.5/health-information/hip/on-request"
+    prev_req_id = req_data['requestId']
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+    payload = json.dumps({
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "hiRequest": {
+            "transactionId": hi_req_trxnId,
+            "sessionStatus": "ACKNOWLEDGED"
+        },
+        "resp": {
+            "requestId": prev_req_id
+        }
+    })
+    headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx',
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("POST", cbl_url, headers=headers, data=payload)
+    print(response)
+
+    # Step 2: Then prepare FHIR data, do enc and send accordingly - FOR EACH CONSENT ARTFACT
     # # Open JSON FHIR file path and read data from it
     # f = open("OPCnsltNoteSmpl.json")
     # data = json.load(f)
