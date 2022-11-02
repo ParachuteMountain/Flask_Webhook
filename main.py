@@ -289,6 +289,42 @@ def users_auth_on_confirm():
     print(request.json)
     return jsonify(summary = {"HIP Users auth": "On Confirm"})
 
+@app.route('/v0.5/users/auth/notify', methods=['POST'])
+def pat_init_cc_link_confirm():
+    # use ONLY when doing Direct mode of authentication
+    # When Auth Init uses Direct mode and confirms it 
+    # in the users/auth/confirm and on-confirm section then users/auth/notify gets called
+    # Lets us know the auth is done - to which we reply using on-notify as an ACK
+
+    print("HIP LOG: Auth notify for Direct auth received!")
+    print(request.json)
+
+    # send on-notify to Gateway
+    cbl_url = f"{GATEWAY_HOST}/v0.5/users/auth/on-notify"
+    req_data = request.json
+    # req_data Example: no example as no direct mode available for authentication in my example
+    prev_req_id = req_data['requestId']
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+    payload = json.dumps({
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "acknowledgement": {
+            "status": "OK"
+        },
+        "resp": {
+            "requestId": prev_req_id
+        }
+    })
+    headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx'
+    }
+    on_notif_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
+    print(on_notif_resp)
+
+    return jsonify(summary = {"HIP Notify": "For direct auth"})
+
 @app.route('/v0.5/links/link/on-add-contexts', methods=['POST'])
 def link_on_add_contexts():
     print("HIP LOG: Link on add contexts received!")
