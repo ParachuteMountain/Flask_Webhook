@@ -290,7 +290,7 @@ def users_auth_on_confirm():
     return jsonify(summary = {"HIP Users auth": "On Confirm"})
 
 @app.route('/v0.5/users/auth/notify', methods=['POST'])
-def pat_init_cc_link_confirm():
+def users_auth_notify():
     # use ONLY when doing Direct mode of authentication
     # When Auth Init uses Direct mode and confirms it 
     # in the users/auth/confirm and on-confirm section then users/auth/notify gets called
