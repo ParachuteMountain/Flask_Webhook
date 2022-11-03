@@ -455,7 +455,7 @@ def hi_request():
     # this GRANT comes in consents/hip/notify and it should be put to DB there
 
     # Step 1 - ON-REQUEST: Ensure all information is upto standards and send ACK using hip/on-request
-    cbl_url = f"{hi_req_dataPushUrl}/v0.5/health-information/hip/on-request"
+    cbl_url = f"{GATEWAY_HOST}/v0.5/health-information/hip/on-request"
     prev_req_id = req_data['requestId']
     req_id = str(uuid.uuid4())
     tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
