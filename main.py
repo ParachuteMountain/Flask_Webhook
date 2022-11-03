@@ -475,6 +475,9 @@ def hi_request():
         'X-CM-ID': 'sbx',
         'Content-Type': 'application/json'
     }
+    # reget auth token to run APIs after it
+    get_gateway_token()
+
     response = requests.request("POST", cbl_url, headers=headers, data=payload)
     print(f"Response for {hi_req_trxnId} is:----")
     print(response)
@@ -530,42 +533,42 @@ def hi_request():
     # transf_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
     # print(transf_resp)
 
-    # Step 3 - NOTIFY: notify the gateway that the transfer is successfully done from our side
-    cbl_url = f"{GATEWAY_HOST}/v0.5/health-information/notify"
-    req_id = str(uuid.uuid4())
-    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
-    payload = json.dumps({
-        "requestId": req_id,
-        "timestamp": tstmp,
-        "notification": {
-            "consentId": "<consent artefact ID>",
-            "transactionId": "<corresponding transaction ID>",
-            "doneAt": "<save the timestamp at which transfer was done>",
-            "notifier": {
-                "type": "HIP",
-                "id": "HIPTst1"
-            },
-            "statusNotification": {
-                "sessionStatus": "TRANSFERRED",  # one of [TRANSFERRED, FAILED]
-                "hipId": "HIPTst1",
-                "statusResponses": [ # give status for each CC
-                    {
-                        "careContextReference": "<CC Ref Number>",
-                        "hiStatus": "DELIVERED", #  one of [ DELIVERED, ERRORED ]
-                        "description": "<any string>"
-                    }
-                ]
-            }
-        }
-    })
-    headers = {
-        'Authorization': GATEWAY_AUTH_TOKEN,
-        'X-CM-ID': 'sbx',
-        'Content-Type': 'application/json'
-    }
-    hi_notify_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
-    print("--------- HIP LOG: HIP has sent Health Info Notify to CM ----------")
-    print(hi_notify_resp)
+    # # Step 3 - NOTIFY: notify the gateway that the transfer is successfully done from our side
+    # cbl_url = f"{GATEWAY_HOST}/v0.5/health-information/notify"
+    # req_id = str(uuid.uuid4())
+    # tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+    # payload = json.dumps({
+    #     "requestId": req_id,
+    #     "timestamp": tstmp,
+    #     "notification": {
+    #         "consentId": "<consent artefact ID>",
+    #         "transactionId": "<corresponding transaction ID>",
+    #         "doneAt": "<save the timestamp at which transfer was done>",
+    #         "notifier": {
+    #             "type": "HIP",
+    #             "id": "HIPTst1"
+    #         },
+    #         "statusNotification": {
+    #             "sessionStatus": "TRANSFERRED",  # one of [TRANSFERRED, FAILED]
+    #             "hipId": "HIPTst1",
+    #             "statusResponses": [ # give status for each CC
+    #                 {
+    #                     "careContextReference": "<CC Ref Number>",
+    #                     "hiStatus": "DELIVERED", #  one of [ DELIVERED, ERRORED ]
+    #                     "description": "<any string>"
+    #                 }
+    #             ]
+    #         }
+    #     }
+    # })
+    # headers = {
+    #     'Authorization': GATEWAY_AUTH_TOKEN,
+    #     'X-CM-ID': 'sbx',
+    #     'Content-Type': 'application/json'
+    # }
+    # hi_notify_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
+    # print("--------- HIP LOG: HIP has sent Health Info Notify to CM ----------")
+    # print(hi_notify_resp)
 
     return jsonify(summary = {"HIP HI": "Request + On-Request + Data Transfer + Notify"})
 
