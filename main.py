@@ -394,6 +394,12 @@ def con_hip_notify():
     print(request.json)
 
     # We can get GRANTED, REVOKED and even EXPIRED values
+    # This is received when patient logs into PHR App and has HIP and CCs connected to it
+    # - For each CC a GRANTED notify is received with purpose of SELF_REQUESTED
+    # - ALso store the date range and allowed HI Types - ONLY THESE INFO should be shared
+
+
+    # Regardless of where the notify comes from we do following:-
     # FIRST, save the consent against ABHA Address for GRANTED
     #    or delete existing ones for REVOKED/EXPIRED values
     # THEN, send acknowledgement callback below
@@ -437,12 +443,16 @@ def hi_request():
 
     # Capture information for bundle transfer
     req_data = request.json
-    hi_req_trxnId = req_data['transactionId']  #### USE THIS IN DATA TRANSFER
+    #### USE FOLLOWING IN DATA TRANSFER
+    hi_req_trxnId = req_data['transactionId']
     hi_req_info = req_data['hiRequest']
     hi_req_consent = hi_req_info['consent']
     hi_req_dataRange = hi_req_info['dateRange']
     hi_req_dataPushUrl = hi_req_info['dataPushUrl']
     hi_req_keyMaterial = hi_req_info['keyMaterial']
+
+    # PRE-STEP ensure the consent ID here has a GRANT and signature in the DB
+    # this GRANT comes in consents/hip/notify and it should be put to DB there
 
     # Step 1 - ON-REQUEST: Ensure all information is upto standards and send ACK using hip/on-request
     cbl_url = f"{hi_req_dataPushUrl}/v0.5/health-information/hip/on-request"
@@ -466,6 +476,7 @@ def hi_request():
         'Content-Type': 'application/json'
     }
     response = requests.request("POST", cbl_url, headers=headers, data=payload)
+    print(f"Response for {hi_req_trxnId} is:----")
     print(response)
 
     # Step 2 - FHIR DATA TRANSFER: Then prepare FHIR data, do enc and send accordingly
