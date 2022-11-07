@@ -25,6 +25,47 @@ MAIN_URL = "https://dev.abdm.gov.in"
 GATEWAY_HOST = f"{MAIN_URL}/gateway"
 CM_URL = f"{MAIN_URL}/cm"
 
+#______________________________________BOTH HIP/HIU-START______________________________________#
+# PATIENT STATUS NOTIFY
+@app.route('/v0.5/patients/status/notify', methods=['POST'])
+def pat_status_notify():
+    print("HIP/HIU LOG: Patient status notify received!")
+    print(request.json)
+
+    # When we receive this we save a patient's status in the DB
+    # If active we can process other ABDM APIs else we report it as Deactivated / Deleted.
+
+    # callback to acknowledge successfull status receiving
+    cbl_url = f"{GATEWAY_HOST}/v0.5/patients/status/on-notify"
+    req_data = request.json
+    prev_req_id = req_data['requestId']
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+    # Sample error code if failed
+    # "error": {
+    #     "code": 1000,
+    #     "message": "string"
+    # },
+    payload = json.dumps({
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "acknowledgment": {
+            "status": "OK"
+        },
+        "resp": {
+            "requestId": prev_req_id
+        }
+    })
+    headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx'
+    }
+    on_notif_status_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
+    print(on_notif_status_resp)
+
+    return jsonify(summary = {"HIP/HIU Patient": "Status notify"})
+#_______________________________________BOTH HIP/HIU END_______________________________________#
+
 #___________________________________________HIU-START__________________________________________#
 #   SUBSCRIPTION REQUESTS URLs
 @app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
@@ -169,45 +210,6 @@ def pat_prof_share():
 
 
     return jsonify(summary = {"HIP Patient": "Prof Share"})
-
-# PATIENT STATUS NOTIFY
-@app.route('/v0.5/patients/status/notify', methods=['POST'])
-def pat_status_notify():
-    print("HIP LOG: Patient status notify received!")
-    print(request.json)
-
-    # When we receive this we save a patient's status in the DB
-    # If active we can do other APIs else we report it as Deactivated / Deleted.
-
-    # callback to acknowledge successfull status receiving
-    cbl_url = f"{GATEWAY_HOST}/v0.5/patients/status/on-notify"
-    req_data = request.json
-    prev_req_id = req_data['requestId']
-    req_id = str(uuid.uuid4())
-    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
-    # Sample error code if failed
-    # "error": {
-    #     "code": 1000,
-    #     "message": "string"
-    # },
-    payload = json.dumps({
-        "requestId": req_id,
-        "timestamp": tstmp,
-        "acknowledgment": {
-            "status": "OK"
-        },
-        "resp": {
-            "requestId": prev_req_id
-        }
-    })
-    headers = {
-        'Authorization': GATEWAY_AUTH_TOKEN,
-        'X-CM-ID': 'sbx'
-    }
-    on_notif_status_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
-    print(on_notif_status_resp)
-
-    return jsonify(summary = {"HIP Patient": "Status notify"})
 
 #   PATIENT INITIATED LINKING
 @app.route('/v0.5/care-contexts/discover', methods=['POST'])
