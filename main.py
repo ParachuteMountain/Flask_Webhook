@@ -15,47 +15,106 @@ import stat
 
 app = Flask(__name__)
 
-# HOME PAGE / FIST PAGE
+# HOME PAGE / FIRST PAGE
 @app.route('/')
 def home():
-    return jsonify(summary = {"Home": "Home v9"})
+    return jsonify(summary = {"Home": "Home v10"})
 
 # ABDM BASE URLs
 MAIN_URL = "https://dev.abdm.gov.in"
 GATEWAY_HOST = f"{MAIN_URL}/gateway"
 CM_URL = f"{MAIN_URL}/cm"
 
-# -------------------- RUN FOR AUTH TOKEN --------------------#
-@app.route('/get-token', methods=['GET'])
-def get_gateway_token():
-    print("-- GATEWAY TOKEN GET! --")
+#___________________________________________HIU-START__________________________________________#
+#   SUBSCRIPTION REQUESTS URLs
+@app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
+def sub_req_on_init():
+    print("HIP LOG: Sub Req on init received!")
+    print(request.json)
+    return jsonify(summary = {"HIP Sub_Req": "On Init"})
 
-    sessions_url = f"{GATEWAY_HOST}/v0.5/sessions"
+@app.route('/v0.5/subscription-requests/hiu/on-notify', methods=['POST'])
+def sub_req_on_notify():
+    print("HIP LOG: Sub Req on notify received!")
+    print(request.json)
+    return jsonify(summary = {"HIP Sub_Req": "On Notify"})
+
+#   CONSENT REQUESTS URLs
+@app.route('/v0.5/patients/on-find', methods=['POST'])
+def pat_on_find():
+    print("HIU LOG: Patient find received!")
+    print(request.json)
+    return jsonify(summary = {"HIU Patient": "On Find"})
+
+@app.route('/v0.5/consent-requests/on-init', methods=['POST'])
+def con_req_on_init():
+    print("HIU LOG: Con Req on init received!")
+    print(request.json)
+    return jsonify(summary = {"HIU Con_Req": "On Init"})
+
+@app.route('/v0.5/consent-requests/on-status', methods=['POST'])
+def con_req_on_status():
+    print("HIU LOG: Con Req on status received!")
+    print(request.json)
+    return jsonify(summary = {"HIU Con_Req": "On Status"})
+
+@app.route('/v0.5/consents/hiu/notify', methods=['POST'])
+def con_hiu_notify():
+    print("HIU LOG: Con HIU notify received!")
+    print(request.json)
+
+    # HIU ON-NOTIFY: quickly send callback to CM about acknowledgement
+    req_data = request.json
+    con_art_id = req_data['notification']['consentArtefacts'][0]['id']
+    con_art_resp_req_id = req_data['requestId']
+    cbl_url = f"{GATEWAY_HOST}/v0.5/consents/hiu/on-notify"
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
     payload = json.dumps({
-        "clientId": "SBX_002007",
-        "clientSecret": "00df942f-402b-4c85-87d4-92e99120f94c"
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "acknowledgement": [
+            {
+                "status": "OK",
+                "consentId": con_art_id
+            }
+        ],
+        "error": {
+            "code": 1000,
+            "message": "string"
+        },
+        "resp": {
+            "requestId": con_art_resp_req_id
+        }
     })
     headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx',
         'Content-Type': 'application/json'
     }
-    response = requests.request('POST', sessions_url, headers=headers, data=payload)
-    global GATEWAY_AUTH_TOKEN
-    GATEWAY_AUTH_TOKEN = f"Bearer {response.json()['accessToken']}"
+    response = requests.request("POST", cbl_url, headers=headers, data=payload)
+    print("--------- HIU LOG: HIU has sent on-notify to CM ----------")
+    print(response)
+    print(f"HIU LOG: On-notify req ID {req_id}")
+    print(f"HIU LOG: On-notify timestamp {tstmp}")
+    print(f"-----------------------------------")
 
-    return response.json()
-# TOKENS - set when Request called to this base
-GATEWAY_AUTH_TOKEN = f"Bearer {get_gateway_token()['accessToken']}"
+    return jsonify(summary = {"HIU Con": "HIU Notify"})
 
-# encrypting secret using RSA PCKS
-def getEncryptedText(rsaKey, secret):
-    keyDER = base64.b64decode(rsaKey)
-    keyPub = RSA.importKey(keyDER)
-    cipherRSA = PKCS1_v1_5.new(keyPub)
-    ciphertext = cipherRSA.encrypt(str.encode(secret))
-    emsg = base64.b64encode(ciphertext)
-    return emsg.decode()
+@app.route('/v0.5/consents/on-fetch', methods=['POST'])
+def con_on_fetch():
+    print("HIU LOG: Con Art on fetch received!")
+    print(request.json)
+    return jsonify(summary = {"HIU Con_Art": "On Fetch"})
 
-# ---------------------------- HIP ---------------------------#
+@app.route('/v0.5/health-information/hiu/on-request', methods=['POST'])
+def hi_on_request():
+    print("HIU LOG: HI on request received!")
+    print(request.json)
+    return jsonify(summary = {"HIU HI": "On Request"})
+#___________________________________________HIU - END__________________________________________#
+
+#___________________________________________HIP-START__________________________________________#
 # PATIENT's PROFILE SHARE
 @app.route('/v1.0/patients/profile/share', methods=['POST'])
 def pat_prof_share():
@@ -571,96 +630,40 @@ def hi_request():
     # print(hi_notify_resp)
 
     return jsonify(summary = {"HIP HI": "Request + On-Request + Data Transfer + Notify"})
+#___________________________________________HIP - END__________________________________________#
 
-#   SUBSCRIPTION REQUESTS URLs
-@app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
-def sub_req_on_init():
-    print("HIP LOG: Sub Req on init received!")
-    print(request.json)
-    return jsonify(summary = {"HIP Sub_Req": "On Init"})
+#__________________________________________MISC - START________________________________________#
+# -------------------- RUN FOR AUTH TOKEN --------------------#
+@app.route('/get-token', methods=['GET'])
+def get_gateway_token():
+    print("-- GATEWAY TOKEN GET! --")
 
-@app.route('/v0.5/subscription-requests/hiu/on-notify', methods=['POST'])
-def sub_req_on_notify():
-    print("HIP LOG: Sub Req on notify received!")
-    print(request.json)
-    return jsonify(summary = {"HIP Sub_Req": "On Notify"})
-
-# ---------------------------- HIU ---------------------------#
-#   CONSENT REQUESTS URLs
-@app.route('/v0.5/patients/on-find', methods=['POST'])
-def pat_on_find():
-    print("HIU LOG: Patient find received!")
-    print(request.json)
-    return jsonify(summary = {"HIU Patient": "On Find"})
-
-@app.route('/v0.5/consent-requests/on-init', methods=['POST'])
-def con_req_on_init():
-    print("HIU LOG: Con Req on init received!")
-    print(request.json)
-    return jsonify(summary = {"HIU Con_Req": "On Init"})
-
-@app.route('/v0.5/consent-requests/on-status', methods=['POST'])
-def con_req_on_status():
-    print("HIU LOG: Con Req on status received!")
-    print(request.json)
-    return jsonify(summary = {"HIU Con_Req": "On Status"})
-
-@app.route('/v0.5/consents/hiu/notify', methods=['POST'])
-def con_hiu_notify():
-    print("HIU LOG: Con HIU notify received!")
-    print(request.json)
-
-    # HIU ON-NOTIFY: quickly send callback to CM about acknowledgement
-    req_data = request.json
-    con_art_id = req_data['notification']['consentArtefacts'][0]['id']
-    con_art_resp_req_id = req_data['requestId']
-    cbl_url = f"{GATEWAY_HOST}/v0.5/consents/hiu/on-notify"
-    req_id = str(uuid.uuid4())
-    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+    sessions_url = f"{GATEWAY_HOST}/v0.5/sessions"
     payload = json.dumps({
-        "requestId": req_id,
-        "timestamp": tstmp,
-        "acknowledgement": [
-            {
-                "status": "OK",
-                "consentId": con_art_id
-            }
-        ],
-        "error": {
-            "code": 1000,
-            "message": "string"
-        },
-        "resp": {
-            "requestId": con_art_resp_req_id
-        }
+        "clientId": "SBX_002007",
+        "clientSecret": "00df942f-402b-4c85-87d4-92e99120f94c"
     })
     headers = {
-        'Authorization': GATEWAY_AUTH_TOKEN,
-        'X-CM-ID': 'sbx',
         'Content-Type': 'application/json'
     }
-    response = requests.request("POST", cbl_url, headers=headers, data=payload)
-    print("--------- HIU LOG: HIU has sent on-notify to CM ----------")
-    print(response)
-    print(f"HIU LOG: On-notify req ID {req_id}")
-    print(f"HIU LOG: On-notify timestamp {tstmp}")
-    print(f"-----------------------------------")
+    response = requests.request('POST', sessions_url, headers=headers, data=payload)
+    global GATEWAY_AUTH_TOKEN
+    GATEWAY_AUTH_TOKEN = f"Bearer {response.json()['accessToken']}"
 
-    return jsonify(summary = {"HIU Con": "HIU Notify"})
+    return response.json()
+# TOKENS - set when Request called to this base
+GATEWAY_AUTH_TOKEN = f"Bearer {get_gateway_token()['accessToken']}"
 
-@app.route('/v0.5/consents/on-fetch', methods=['POST'])
-def con_on_fetch():
-    print("HIU LOG: Con Art on fetch received!")
-    print(request.json)
-    return jsonify(summary = {"HIU Con_Art": "On Fetch"})
+# --------------- DATA ENCRYPTION USING RSA ECB PCKS -------------    
+# Function encrypting secret using RSA PCKS
+def getEncryptedText(rsaKey, secret):
+    keyDER = base64.b64decode(rsaKey)
+    keyPub = RSA.importKey(keyDER)
+    cipherRSA = PKCS1_v1_5.new(keyPub)
+    ciphertext = cipherRSA.encrypt(str.encode(secret))
+    emsg = base64.b64encode(ciphertext)
+    return emsg.decode()
 
-@app.route('/v0.5/health-information/hiu/on-request', methods=['POST'])
-def hi_on_request():
-    print("HIU LOG: HI on request received!")
-    print(request.json)
-    return jsonify(summary = {"HIU HI": "On Request"})
-
-# --------------- DATA ENCRYPTION USING RSA ECB PCKS -------------
 @app.route('/encrypt-secret/<keyType>/<secret>', methods=['POST'])
 def enc_secret(keyType, secret):
     print("Encrypting secret!")
@@ -717,7 +720,7 @@ cQIDAQAB
     encrypted_secret = getEncryptedText(public_key, secret)
 
     return jsonify({"encSecret": encrypted_secret})
-
+#___________________________________________MISC-END__________________________________________#
 
 if __name__ == '__main__':
     app.run(debug=True)
