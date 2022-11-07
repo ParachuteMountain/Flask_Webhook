@@ -137,6 +137,7 @@ def sub_req_notify():
 
     return jsonify(summary = {"HIU Sub_Req": "Notification + ACK ON-NOTIFY"})
 
+# new data lnikages notifications
 @app.route('/v0.5/subscriptions/hiu/notify', methods=['POST'])
 def sub_notif():
     print("HIU LOG: New data generated notification received!")
