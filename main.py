@@ -251,7 +251,7 @@ def con_req_on_status():
     req_con_req_status = req_data['consentRequest']['status']
     # get the consent artefacts for this consent request ID (see example few lines below)
     #  - (once request is GRANTED and artefacts have been generated)
-    req_con_req_con_arts = req_data['consentRequest']['status']['consentArtefacts']
+    req_con_req_con_arts = req_data['consentRequest']['consentArtefacts']
     # Example - 'consentArtefacts': [{'id': 'c8172e2d-e06d-4938-8b00-7d92defd7788'}]
 
     # Find the consent Req ID coming here in our DB and store the stats (and consent artefacts if any)
