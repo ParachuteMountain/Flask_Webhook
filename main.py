@@ -73,10 +73,10 @@ def sub_req_on_init():
     print("HIU LOG: Sub Req on init received!")
     print(request.json)
 
-    # get the subscription ID and save it to the DB along with a ink to the subbed patient
+    # get the subscription ID and save it to the DB along with the ID of to-be-subscribed patient
     req_data = request.json
     prev_req_id = req_data['requestId']
-    req_data_sub_id = req_data["subscriptionRequest"]["id"]
+    req_sub_req_id = req_data["subscriptionRequest"]["id"]
 
     return jsonify(summary = {"HIU Sub_Req": "On Init"})
 
@@ -85,52 +85,130 @@ def sub_req_on_init():
 def sub_req_notify():
     print("HIU LOG: Sub Req notification received!")
     print(request.json)
-    
-    # req_id = str(uuid.uuid4())
-    # tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
-    # payload = json.dumps({
-    #     "requestId": req_id,
-    #     "timestamp": tstmp,
-    #     "subscription": {
-    #         "purpose": {
-    #             "text": "string",
-    #             "code": "string",
-    #             "refUri": "string"
-    #         },
-    #         "patient": {
-    #             "id": "hinapatel@ndhm"
-    #         },
-    #         "hiu": {
-    #             "id": "string"
-    #         },
-    #         "hips": [
-    #             {
-    #                 "id": "string"
-    #             }
-    #         ],
-    #         "categories": [
-    #             "LINK"
-    #         ],
-    #         "period": {
-    #             "from": "2022-11-07T05:56:57.151Z",
-    #             "to": "2022-11-07T05:56:57.151Z"
-    #         }
-    #     }
-    # })
-    # headers = {
-    #     'Authorization': GATEWAY_AUTH_TOKEN,
-    #     'X-CM-ID': 'sbx'
-    # }
-    # on_notif_status_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
-    # print(on_notif_status_resp)
 
-    return jsonify(summary = {"HIU Sub_Req": "Nptification"})
+    # get the following information from data received
+    req_data = request.json
+    # - sub request ID
+    req_sub_notif = req_data['notification']
+    req_sub_req_id = req_sub_notif['subscriptionRequestId']
+    # - grant status
+    req_grant_status = req_sub_notif['status']
+    # - subscription details
+    req_sub_details = req_sub_notif['subscription']
+    #   - sub ID
+    req_sub_id = req_sub_details['id']
+    #   - link/data sources - list of sources (dicts) each dict having 
+    #       - 'hip' info dict ('id' and 'name' keys)
+    #       - 'categories' - list with 'LINK'/'DATA'/both
+    #       - 'period' dict ('from' and 'to' keys)
+    req_sub_srcs = req_sub_details['sources']
+    # FIND OR STORE all this for a specific patient PHR ID - sub req ID - sub ID - sub details stuff
+    # Note: this can come in multiple times for same sub req ID 
+    # - Have a flag of Granted/Denied for each subscription
+    # - change this flag everytime we come here and the sub gets active/denied
 
-@app.route('/v0.5/subscription-requests/hiu/on-notify', methods=['POST'])
-def sub_req_on_notify():
-    print("HIP LOG: Sub Req on notify received!")
+    # callback with ACK of the request recieved    
+    cbl_url = f"{GATEWAY_HOST}/v0.5/subscription-requests/hiu/on-notify"
+    prev_req_id = req_data['requestId']
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+    # Sample error    
+    # "error": {
+    #     "code": 1000,
+    #     "message": "string"
+    # },
+    payload = json.dumps({
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "acknowledgement": {
+            "status": "OK",
+            "subscriptionRequestId": req_sub_req_id
+        },
+        "resp": {
+            "requestId": prev_req_id
+        }
+    })
+    headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx'
+    }
+    on_notif_sub_req_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
+    print(on_notif_sub_req_resp)
+
+    return jsonify(summary = {"HIU Sub_Req": "Notification + ACK ON-NOTIFY"})
+
+@app.route('/v0.5/subscriptions/hiu/notify', methods=['POST'])
+def sub_notif():
+    print("HIU LOG: New data generated notification received!")
     print(request.json)
-    return jsonify(summary = {"HIP Sub_Req": "On Notify"})
+
+    # if event.category = LINK, 
+    #   then only CCs are passed when new CCs are linked to patients.
+    # If event.category = DATA,
+    #   then hiTypes are passed. CC is passed only if the subscribed HIU has any valid consent for that CC
+    
+    # get the following information from data received
+    req_data = request.json
+    # - event info
+    req_event = req_data['event']
+    req_event_id = req_event['id']
+    req_event_pub = req_event['published']
+    req_event_sub_id = req_event['subscriptionId'] #---> use this to know the event subcription ID
+    req_event_cat = req_event['category'] # LINK or DATA
+    # - content in the event
+    req_event_content = req_event['content']
+    # Example content data
+    # "content": {
+    #   "patient": {
+    #     "id": "hinapatel@ndhm"
+    #   },
+    #   "hip": {
+    #     "id": "string"
+    #   },
+    #   "context": [
+    #     {
+    #       "careContext": {
+    #         "patientReference": "batman@tmh",
+    #         "careContextReference": "Episode1"
+    #       },
+    #       "hiTypes": [
+    #         "OPConsultation"
+    #       ]
+    #     }
+    #   ]
+    # }
+    # Note: here we can save the pat ref, CC ref, HI types for particular patient
+    #  - ONLY SAVE UNTIL SUB LASTS
+
+    # callback with ACK of the request recieved
+    prev_req_id = req_data['requestId']
+    cbl_url = f"{GATEWAY_HOST}/v0.5/subscriptions/hiu/on-notify"
+    req_id = str(uuid.uuid4())
+    tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+    # Sample error    
+    # "error": {
+    #     "code": 1000,
+    #     "message": "string"
+    # },
+    payload = json.dumps({
+        "requestId": req_id,
+        "timestamp": tstmp,
+        "acknowledgement": {
+            "status": "OK",
+            "eventId": req_event_sub_id
+        },
+        "resp": {
+            "requestId": prev_req_id
+        }
+    })
+    headers = {
+        'Authorization': GATEWAY_AUTH_TOKEN,
+        'X-CM-ID': 'sbx'
+    }
+    sub_notify_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
+    print(sub_notify_resp)
+
+    return jsonify(summary = {"HIU Sub": "New link/data notification + ACK ON-NOTIFY"})
 
 #   CONSENT REQUESTS URLs
 @app.route('/v0.5/patients/on-find', methods=['POST'])
