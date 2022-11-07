@@ -143,9 +143,10 @@ def sub_notif():
     print(request.json)
 
     # if event.category = LINK, 
-    #   then only CCs are passed when new CCs are linked to patients.
+    #   then only CCs are passed when new CCs are linked to patients. hiTypes comes empty list.
     # If event.category = DATA,
-    #   then hiTypes are passed. CC is passed only if the subscribed HIU has any valid consent for that CC
+    #   then hiTypes are passed - hiTypes is filled. 
+    #   CC is passed only if the subscribed HIU has any valid consent for that CC
     
     # get the following information from data received
     req_data = request.json
@@ -153,7 +154,7 @@ def sub_notif():
     req_event = req_data['event']
     req_event_id = req_event['id']
     req_event_pub = req_event['published']
-    req_event_sub_id = req_event['subscriptionId'] #---> use this to know the event subcription ID
+    req_event_sub_id = req_event['subscriptionId'] # not same as subcription ID
     req_event_cat = req_event['category'] # LINK or DATA
     # - content in the event
     req_event_content = req_event['content']
