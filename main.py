@@ -68,11 +68,55 @@ def pat_status_notify():
 
 #___________________________________________HIU-START__________________________________________#
 #   SUBSCRIPTION REQUESTS URLs
-@app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
-def sub_req_on_init():
-    print("HIP LOG: Sub Req on init received!")
-    print(request.json)
-    return jsonify(summary = {"HIP Sub_Req": "On Init"})
+# @app.route('/v0.5/subscription-requests/hiu/on-init', methods=['POST'])
+# def sub_req_on_init():
+#     print("HIU LOG: Sub Req on init received!")
+#     print(request.json)
+
+#     # call to CM to start subscription
+#     cbl_url = f"{GATEWAY_HOST}/v0.5/subscription-requests/cm/init"
+#     req_data = request.json
+#     prev_req_id = req_data['requestId']
+#     req_data_sub_id = req_data["subscriptionRequest"]["id"]
+#     req_id = str(uuid.uuid4())
+#     tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
+#     payload = json.dumps({
+#         "requestId": req_id,
+#         "timestamp": tstmp,
+#         "subscription": {
+#             "purpose": {
+#                 "text": "string",
+#                 "code": "string",
+#                 "refUri": "string"
+#             },
+#             "patient": {
+#                 "id": "hinapatel@ndhm"
+#             },
+#             "hiu": {
+#                 "id": "string"
+#             },
+#             "hips": [
+#                 {
+#                     "id": "string"
+#                 }
+#             ],
+#             "categories": [
+#                 "LINK"
+#             ],
+#             "period": {
+#                 "from": "2022-11-07T05:56:57.151Z",
+#                 "to": "2022-11-07T05:56:57.151Z"
+#             }
+#         }
+#     })
+#     headers = {
+#         'Authorization': GATEWAY_AUTH_TOKEN,
+#         'X-CM-ID': 'sbx'
+#     }
+#     on_notif_status_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
+#     print(on_notif_status_resp)
+
+#     return jsonify(summary = {"HIU Sub_Req": "On Init"})
 
 @app.route('/v0.5/subscription-requests/hiu/on-notify', methods=['POST'])
 def sub_req_on_notify():
