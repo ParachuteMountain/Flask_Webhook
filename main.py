@@ -148,6 +148,7 @@ def sub_notif():
     # If event.category = DATA,
     #   then hiTypes are passed - hiTypes is filled. 
     #   CC is passed only if the subscribed HIU has any valid consent for that CC
+    # TO DO LATER: think about the line above.
     
     # get the following information from data received
     req_data = request.json
@@ -210,25 +211,51 @@ def sub_notif():
     sub_notify_resp = requests.request("POST", cbl_url, headers=headers, data=payload)
     print(sub_notify_resp)
 
+    # NOTE: After this we can start asking for the actual data (consent request -> artefact -> transfer)
+    # - can only do this with 'DATA' category linked
+
     return jsonify(summary = {"HIU Sub": "New link/data notification + ACK ON-NOTIFY"})
 
-#   CONSENT REQUESTS URLs
+#   CONSENT MANAGEMENT START
+# result of finding patient information
 @app.route('/v0.5/patients/on-find', methods=['POST'])
 def pat_on_find():
     print("HIU LOG: Patient find received!")
     print(request.json)
+
+    # only follow next steps of consent if this returns existence of patient in ABDM
+
     return jsonify(summary = {"HIU Patient": "On Find"})
 
 @app.route('/v0.5/consent-requests/on-init', methods=['POST'])
 def con_req_on_init():
     print("HIU LOG: Con Req on init received!")
     print(request.json)
+
+    # store information of consent request in DB 
+    # - goes with other info found in body of v0.5/consent-requests/init
+    req_data = request.json
+    req_con_req_id = req_data['consentRequest']['id']
+
     return jsonify(summary = {"HIU Con_Req": "On Init"})
 
 @app.route('/v0.5/consent-requests/on-status', methods=['POST'])
 def con_req_on_status():
     print("HIU LOG: Con Req on status received!")
     print(request.json)
+
+    # this will be helpful when HIU asks for data but the status shows as not granted yet (REQUESTED)
+    # Also, it gives all the consent artefacts tied to the soecific consent request ID
+    req_data = request.json
+    req_con_req_id = req_data['consentRequest']['id']
+    req_con_req_status = req_data['consentRequest']['status']
+    # get the consent artefacts for this consent request ID (see example few lines below)
+    #  - (once request is GRANTED and artefacts have been generated)
+    req_con_req_con_arts = req_data['consentRequest']['status']['consentArtefacts']
+    # Example - 'consentArtefacts': [{'id': 'c8172e2d-e06d-4938-8b00-7d92defd7788'}]
+
+    # Find the consent Req ID coming here in our DB and store the stats (and consent artefacts if any)
+
     return jsonify(summary = {"HIU Con_Req": "On Status"})
 
 @app.route('/v0.5/consents/hiu/notify', methods=['POST'])
@@ -238,8 +265,17 @@ def con_hiu_notify():
 
     # HIU ON-NOTIFY: quickly send callback to CM about acknowledgement
     req_data = request.json
-    con_art_id = req_data['notification']['consentArtefacts'][0]['id']
-    con_art_resp_req_id = req_data['requestId']
+    prev_req_id = req_data['requestId']
+    con_arts_list = req_data['notification']['consentArtefacts'] # is a list of dicts
+
+    # we get a list of consent artefacts ID and their statuses
+    # Store all of these in the DB - HIU Front End can show all of these as regular updates
+    # - for each consent request ID - stores ALL consent artefacts (one con art for each HIP)
+    # ALSO, run the fetch command for getting info on each artefact and storing in the DB
+
+    # For each consent artefact send a notification ACK 
+    # - Example below for first consent artefact
+    con_art_id = con_arts_list[0]['id']
     cbl_url = f"{GATEWAY_HOST}/v0.5/consents/hiu/on-notify"
     req_id = str(uuid.uuid4())
     tstmp = datetime.datetime.utcnow().isoformat()[:-3]+'Z'
@@ -252,12 +288,8 @@ def con_hiu_notify():
                 "consentId": con_art_id
             }
         ],
-        "error": {
-            "code": 1000,
-            "message": "string"
-        },
         "resp": {
-            "requestId": con_art_resp_req_id
+            "requestId": prev_req_id
         }
     })
     headers = {
@@ -266,7 +298,7 @@ def con_hiu_notify():
         'Content-Type': 'application/json'
     }
     response = requests.request("POST", cbl_url, headers=headers, data=payload)
-    print("--------- HIU LOG: HIU has sent on-notify to CM ----------")
+    print("--------- HIU LOG: HIU has sent on-notify to CM for each consent artefact ----------")
     print(response)
     print(f"HIU LOG: On-notify req ID {req_id}")
     print(f"HIU LOG: On-notify timestamp {tstmp}")
@@ -278,6 +310,15 @@ def con_hiu_notify():
 def con_on_fetch():
     print("HIU LOG: Con Art on fetch received!")
     print(request.json)
+
+    # the fetch API will be called for each consent artefact - info for each will come here
+    # Store all the required info in the DB for each consent artefact
+    # Example of the reply here:
+    # {'requestId': '467c862f-eb24-4833-af46-bdf755bd9094', 'timestamp': '2022-11-07T09:50:06.682765', 'consent': {'status': 'EXPIRED', 'consentDetail': {'schemaVersion': 'v0.5', 'consentId': 'c8172e2d-e06d-4938-8b00-7d92defd7788', 'createdAt': '2022-10-18T10:14:16.270863', 'patient': {'id': 'm1test.1092@sbx'}, 'careContexts': [{'patientReference': 'AP_D1', 'careContextReference': 'AP_D1_CC1'}], 'purpose': {'text': 'Care Management', 'code': 'CAREMGT', 'refUri': ''}, 'hip': {'id': 'HIPTst1', 'name': 'ABC HIP'}, 'hiu': {'id': 'HIUTst1', 'name': None}, 'consentManager': {'id': 'sbx'}, 'requester': {'name': 'Dr. ABC XYZ DCT', 'identifier': None}, 'hiTypes': ['OPConsultation'], 'permission': {'accessMode': 'VIEW', 'dateRange': {'from': '2022-10-10T10:12:32.399', 'to': '2022-10-18T04:12:32.399'}, 'dataEraseAt': '2022-10-20T10:14:16.714', 'frequency': {'unit': 'HOUR', 'value': 1, 'repeats': 0}}}, 'signature': 'mWis9yawRxSqCvsL0YtMqtuEYCbX8RgW8TfaxoPjr+huo5Wrksg5sQOcECtoZTj3KZZhX33mKZfzE83Xh2LuP6bM9IluMWy2R9O9BRtx72/RjY2WFVFO7f/zmZljzb+88nu2cM9gCXaL6iZhHM6Z8V3im0G19slxPOPWV8w+9PbNJGxFuGS6FYxQrQ2TYbrA1QScgc9pm0ZrNuli+bqio9/4a1rWIdwp5EYXwAmE7AbJjMjJT/bMmUWSF7+0VIaBr7gWCeRfqoRI7oihqJUCvZzlc9W7NRkiByTfoVdkPLt+Psl8Qki36MpV/kmRUJC7mSjCFU+6jEPW2lXt7fDgWQ=='}, 'error': None, 'resp': {'requestId': '644521f4-b38a-4085-b250-f18d2e5351c4'}}
+
+
+    # After saving all the information send hi/request APIs for each
+
     return jsonify(summary = {"HIU Con_Art": "On Fetch"})
 
 @app.route('/v0.5/health-information/hiu/on-request', methods=['POST'])
