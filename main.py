@@ -485,7 +485,7 @@ def pat_prof_share():
     # This is in Postman M1_Wise_APIs and will be called by the mobile app
     # We will need to tell the app (or the HIP hospital application) to start the 
     #     verification process and also pass the demographics info from here
-    # FILL THAT CODE HERE - an API call to the app
+    # FILL THAT CODE HERE - an API call to the app (or think of another way?!)
 
 
     return jsonify(summary = {"HIP Patient": "Prof Share"})
@@ -500,7 +500,7 @@ def pat_init_cc_link_disc():
     # first do some searching in the HRP itself based on request.json data information
     # req_data Example: {'patient': {'id': 'm1test.1092@sbx', 'name': 'Abhishek Suhasrao Patil', 'gender': 'M', 'yearOfBirth': 1996, 'verifiedIdentifiers': [{'type': 'MOBILE', 'value': '8976165694'}, {'type': 'NDHM_HEALTH_NUMBER', 'value': '91-3108-7321-4236'}, {'type': 'HEALTH_ID', 'value': 'm1test.1092@sbx'}], 'unverifiedIdentifiers': [{'type': 'MOBILE', 'value': '+917499094276'}]}, 'requestId': '8d795bc1-b464-4cb1-98f2-c1adab2631c2', 'timestamp': '2022-11-01T11:11:44.115743', 'transactionId': '245a7942-ba04-4dbf-85a5-96d718c88d37'}
     # IMPORTANT: SAVE the ABHA ID for this patient in DB too!
-    # Get the care contexts for the patient using Fuzzy Match
+    # Get the care contexts for THIS patient (using Fuzzy Match to get THIS patient)
     # Check for more info: F:\AbPt_ABDM\FHIR\FHIR_Understanding\CC+FHIR\HIP_CC file
     # =================== YOU MUST GIVE MASKED DETAILS FOR CARE CONTEXTS ================
     # Give patient info if found (even with 0 CC) - MUST GIVE ALL RECORDS OVER THE YEARS!
@@ -736,7 +736,7 @@ def con_hip_notify():
     # We can get GRANTED, REVOKED and even EXPIRED values
     # This is received when patient logs into PHR App and has HIP and CCs connected to it
     # - For each CC a GRANTED notify is received with purpose of SELF_REQUESTED
-    # - ALso store the date range and allowed HI Types - ONLY THESE INFO should be shared
+    # - Also store the date range and allowed HI Types - ONLY THESE INFO should be shared
 
 
     # Regardless of where the notify comes from we do following:-
